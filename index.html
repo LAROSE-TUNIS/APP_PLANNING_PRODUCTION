@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMA Production — La Rose de Tunis</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#2C2C2A;background:#F9F9F7;line-height:1.5;min-height:100vh}
+.app{max-width:1340px;margin:0 auto;padding:1.25rem 1rem}
+.header{background:#F1EFE8;border-radius:12px;padding:14px 18px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border:0.5px solid #E0DDD4}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:42px;height:42px;border-radius:10px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:24px;color:#BA7517}
+.t1{font-size:17px;font-weight:700}.t2{font-size:12px;color:#888780}
+.nav{display:flex;gap:5px;flex-wrap:wrap}
+.nb{padding:7px 13px;font-size:13px;font-weight:600;border:0.5px solid #D4D2C9;border-radius:8px;cursor:pointer;background:#fff;color:#888780;display:flex;align-items:center;gap:5px}
+.nb i{font-size:15px}.nb.active,.nb:hover{background:#BA7517;color:#fff;border-color:#BA7517}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1.25rem}
+.kpi{background:#fff;border:0.5px solid #E0DDD4;border-radius:10px;padding:12px 14px}
+.kpi-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:8px}
+.kpi-num{font-size:22px;font-weight:700;line-height:1}.kpi-lbl{font-size:12px;color:#888780;margin-top:4px}
+.panel{display:none}.panel.active{display:block}
+.sec-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title i{font-size:17px;color:#BA7517}
+.tw{overflow-x:auto;border-radius:10px;border:0.5px solid #E0DDD4;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:12px;font-weight:700;color:#888780;padding:9px 11px;background:#F9F9F7;text-align:left;border-bottom:0.5px solid #E0DDD4;white-space:nowrap}
+td{padding:8px 11px;border-bottom:0.5px solid #F0EEE8;vertical-align:middle;color:#2C2C2A}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF8}
+.msep td{background:#F9F9F7!important;font-size:13px;font-weight:700;padding:6px 11px;border-top:0.5px solid #E0DDD4}
+input[type=text],input[type=number],input[type=date],select{font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;border-radius:8px;border:0.5px solid #D4D2C9;background:#fff;color:#2C2C2A;width:100%}
+input:focus,select:focus{outline:2px solid #BA7517;outline-offset:-1px;border-color:#BA7517}
+.lbl{font-size:12px;font-weight:700;color:#888780;margin-bottom:4px;display:block}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;border:0.5px solid #D4D2C9;background:#F1EFE8;color:#2C2C2A}
+.btn-gold{background:#BA7517;color:#fff;border-color:#BA7517}
+.btn-red{background:#FCEBEB;color:#A32D2D;border-color:#F7C1C1}
+.btn-green{background:#EAF3DE;color:#27500A;border-color:#C0DD97}
+.btn-blue{background:#E6F1FB;color:#0C447C;border-color:#B5D4F4}
+.btn-orange{background:#FAEEDA;color:#633806;border-color:#FAC775}
+.btn-purple{background:#EEEDFE;color:#3C3489;border-color:#C5C2F8}
+.btn i{font-size:15px}
+.bar{height:6px;background:#F1EFE8;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.sbtn{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;border:none;display:inline-block}
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;padding:4px 9px;border-radius:20px;cursor:pointer;border:1.5px solid transparent;user-select:none}
+.chip.on{border-color:currentColor}
+.divider{height:0.5px;background:#E0DDD4;margin:16px 0}
+.dlc-opts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.dlc-opt{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;cursor:pointer;border:1.5px solid #D4D2C9;background:#F9F9F7;color:#888780;user-select:none}
+.dlc-opt.sel{background:#BA7517;color:#fff;border-color:#BA7517}
+.fl{display:flex;flex-direction:column;gap:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.l-froid{background:#EFF6FC;color:#0C447C}.l-sec{background:#EAF3DE;color:#27500A}
+.of-card{background:#fff;border:0.5px solid #E0DDD4;border-radius:12px;margin-bottom:14px;overflow:hidden}
+.of-banner{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:0.5px solid #E0DDD4;background:#F9F9F7}
+.of-body{padding:14px 16px}
+.pres-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:5px}
+.pres-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;border:0.5px solid #E0DDD4;background:#F9F9F7}
+.pres-item.on{background:#fff;border-color:#BA7517}
+.pres-cb{width:18px;height:18px;border-radius:4px;border:2px solid #D4D2C9;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.pres-item.on .pres-cb{background:#BA7517;border-color:#BA7517;color:#fff}
+.prod-ligne{border:0.5px solid #E0DDD4;border-radius:10px;margin-bottom:8px;overflow:hidden;background:#fff}
+.prod-ligne-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F9F9F7;border-bottom:0.5px solid #E0DDD4}
+.prod-ligne-body{padding:12px}
+/* SUIVI */
+.filter-bar{background:#F1EFE8;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;border:0.5px solid #E0DDD4}
+.filter-bar .fl{flex:1;min-width:100px}
+.filter-bar select,.filter-bar input{padding:6px 9px;font-size:12px}
+.add-form-s{background:#F1EFE8;border-radius:10px;padding:14px;border:0.5px solid #E0DDD4;margin-bottom:14px;display:none}
+.add-form-s.open{display:block}
+/* Choix SF/Fini dans le formulaire */
+.statut-choice{display:flex;gap:8px;margin-bottom:12px}
+.sc-btn{flex:1;padding:10px;border-radius:10px;border:2px solid #D4D2C9;cursor:pointer;text-align:center;font-weight:700;font-size:14px;background:#fff;transition:all .15s}
+.sc-btn.sel-sf{background:#FAEEDA;border-color:#BA7517;color:#633806}
+.sc-btn.sel-fi{background:#EAF3DE;border-color:#27500A;color:#27500A}
+.art-list-s{border:0.5px solid #E0DDD4;border-radius:12px;overflow:hidden;background:#fff}
+.art-list-hdr-s{display:grid;grid-template-columns:28px 2fr 90px 90px 90px 1fr 100px auto;gap:6px;padding:8px 14px;background:#F9F9F7;border-bottom:0.5px solid #E0DDD4;font-size:11px;font-weight:700;color:#888780;align-items:center}
+.art-row-s{display:grid;grid-template-columns:28px 2fr 90px 90px 90px 1fr 100px auto;gap:6px;align-items:center;padding:9px 14px;border-bottom:0.5px solid #F0EEE8;cursor:pointer;background:#fff}
+.art-row-s:hover{background:#FAFAF8}
+.art-row-s:last-child{border-bottom:none}
+.art-row-s.has-alert{background:#FFF9F0}
+.pal-det-s{display:none;border-top:0.5px solid #E0DDD4}
+.pal-det-s.open{display:block}
+.pal-sec-t{font-size:12px;font-weight:700;padding:6px 14px;border-bottom:0.5px solid #F0EEE8}
+.pt{width:100%;border-collapse:collapse;font-size:13px}
+.pt th{font-size:11px;font-weight:700;color:#888780;padding:7px 10px;background:#F9F9F7;text-align:left;border-bottom:0.5px solid #E0DDD4;white-space:nowrap}
+.pt td{padding:7px 10px;border-bottom:0.5px solid #F0EEE8;vertical-align:middle}
+.pt tr:last-child td{border-bottom:none}
+.pt tr:hover td{background:#FAFAF8}
+.sf-n{background:#FAEEDA;color:#BA7517}.fi-n{background:#EAF3DE;color:#27500A}
+.dlc-w{background:#FFF3E0;color:#E65100;border:1px solid #FFB74D;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+.dlc-ap{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#FCEBEB;color:#A32D2D;border:1px solid #F7C1C1}
+.save-dot{width:8px;height:8px;border-radius:50%;background:#27500A;display:inline-block;margin-left:6px;opacity:0;transition:opacity .3s}
+.save-dot.visible{opacity:1}
+.eq-op-card{background:#fff;border:0.5px solid #E0DDD4;border-radius:10px;padding:12px}
+.eq-op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
+.eq-lieu-block{border:0.5px solid #E0DDD4;border-radius:10px;margin-bottom:14px;overflow:hidden}
+.eq-lieu-hdr{padding:10px 14px;border-bottom:0.5px solid #E0DDD4;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.eq-lieu-body{padding:14px}
+.hist-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;margin-bottom:4px;border:0.5px solid #E0DDD4;font-size:13px;flex-wrap:wrap;background:#fff}
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-bg.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:20px;max-width:580px;width:92%;border:0.5px solid #D4D2C9;box-shadow:0 8px 32px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.close-x{cursor:pointer;font-size:22px;color:#888780;line-height:1}
+.ti-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:0.5px solid #E0DDD4;margin-bottom:5px;cursor:pointer;background:#F9F9F7}
+.ti-item.ck{border-color:#BA7517;background:#fff}
+.ti-cb{width:20px;height:20px;border-radius:5px;border:2px solid #D4D2C9;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.ti-item.ck .ti-cb{background:#BA7517;border-color:#BA7517;color:#fff}
+.conf-pal{border:0.5px solid #E0DDD4;border-radius:10px;padding:12px;margin-bottom:8px;background:#F9F9F7}
+.pr-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:0.5px solid #E0DDD4;margin-bottom:5px;background:#F9F9F7}
+.pr-item.ck{border-color:#0C447C;background:#F0F6FF}
+.pr-cb{width:20px;height:20px;border-radius:5px;border:2px solid #D4D2C9;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
+.pr-item.ck .pr-cb{background:#0C447C;border-color:#0C447C;color:#fff}
+@media(max-width:600px){.g3,.g4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.art-list-hdr-s,.art-row-s{grid-template-columns:1fr 1fr auto}}
+</style>
+<style>
+/* ── LOGIN SCREEN ── */
+.login-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#F9F6F0 0%,#FFF8EC 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#fff;border-radius:16px;padding:36px 40px;max-width:420px;width:90%;border:0.5px solid #E0DDD4;box-shadow:0 8px 40px rgba(186,117,23,.12)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .icon{width:64px;height:64px;border-radius:16px;background:#FAEEDA;display:inline-flex;align-items:center;justify-content:center;font-size:32px;color:#BA7517;margin-bottom:12px}
+.login-logo .name{font-size:20px;font-weight:700;color:#2C2C2A}
+.login-logo .sub{font-size:13px;color:#888780;margin-top:4px}
+.login-tabs{display:flex;gap:4px;background:#F1EFE8;border-radius:8px;padding:3px;margin-bottom:20px}
+.login-tab{flex:1;padding:8px;border-radius:6px;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:#888780}
+.login-tab.active{background:#fff;color:#2C2C2A;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:12px;font-weight:700;color:#888780;margin-bottom:5px}
+.login-field input{width:100%;padding:10px 12px;border-radius:8px;border:0.5px solid #D4D2C9;font-family:'Inter',sans-serif;font-size:14px;background:#fff;color:#2C2C2A}
+.login-field input:focus{outline:2px solid #BA7517;border-color:#BA7517}
+.login-btn{width:100%;padding:12px;background:#BA7517;color:#fff;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.login-btn:hover{background:#9E6412}
+.login-err{background:#FCEBEB;color:#A32D2D;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:12px;display:none}
+.login-err.show{display:block}
+.db-status{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+.db-ok{background:#EAF3DE;color:#27500A}
+.db-err{background:#FCEBEB;color:#A32D2D}
+.db-loading{background:#E6F1FB;color:#0C447C}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">🌸</div>
+      <div class="name">La Rose de Tunis</div>
+      <div class="sub">Plan de production Ramadan</div>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
+      <button class="login-tab" id="tab-signup" onclick="switchTab('signup')">Créer un compte</button>
+    </div>
+    <div id="login-err" class="login-err"></div>
+    <div class="login-field">
+      <label>Adresse email</label>
+      <input type="email" id="auth-email" placeholder="exemple@larosedetunis.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Mot de passe</label>
+      <input type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-field" id="field-confirm" style="display:none">
+      <label>Confirmer le mot de passe</label>
+      <input type="password" id="auth-pass2" placeholder="••••••••">
+    </div>
+    <button class="login-btn" id="auth-btn" onclick="doAuth()">Se connecter</button>
+    <div style="text-align:center;margin-top:14px">
+      <span id="db-status-badge" class="db-status db-loading"><i class="ti ti-loader" style="font-size:12px"></i>Connexion...</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="main-app" style="display:none">
+<div class="app">
+<div class="header">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-flower"></i></div>
+    <div><div class="t1">La Rose de Tunis <span class="save-dot" id="save-dot"></span></div><div class="t2">BMA Production — Ramadan</div></div>
+  </div>
+  <div class="nav">
+    <button class="nb active" data-v="of"><i class="ti ti-clipboard-list"></i>OF Journalier</button>
+    <button class="nb" data-v="suivi"><i class="ti ti-chart-line"></i>Suivi stockage</button>
+    <button class="nb" data-v="prod"><i class="ti ti-stack-2"></i>Prod</button>
+    <button class="nb" data-v="historique"><i class="ti ti-history"></i>Historique</button>
+    <button class="nb" data-v="articles"><i class="ti ti-table"></i>Articles</button>
+    <button class="nb" data-v="equipes"><i class="ti ti-users"></i>Equipes</button>
+    <span id="db-badge" class="db-status db-loading" style="font-size:11px"><i class="ti ti-loader" style="font-size:11px"></i>...</span><button class="btn btn-red" style="padding:5px 10px;font-size:12px" onclick="doSignOut()" title="Se déconnecter"><i class="ti ti-logout"></i></button>
+  </div>
+</div>
+<div class="kpis" id="kpis-bar"></div>
+<div class="panel active" id="v-of"></div>
+<div class="panel" id="v-suivi"></div>
+<div class="panel" id="v-prod"></div>
+<div class="panel" id="v-historique"></div>
+<div class="panel" id="v-articles"></div>
+<div class="panel" id="v-equipes"></div>
+<div class="modal-bg" id="m-transf" onclick="cM('m-transf',event)"><div class="modal-box" onclick="event.stopPropagation()"><div class="modal-title"><span><i class="ti ti-arrow-right" style="color:#27500A;margin-right:6px"></i>Transfert SF → Fini</span><span class="close-x" onclick="cM('m-transf')">×</span></div><div id="transf-c"></div></div></div>
+<div class="modal-bg" id="m-retour" onclick="cM('m-retour',event)"><div class="modal-box" onclick="event.stopPropagation()"><div class="modal-title"><span><i class="ti ti-arrow-left" style="color:#633806;margin-right:6px"></i>Retour Fini → SF</span><span class="close-x" onclick="cM('m-retour')">×</span></div><div id="retour-c"></div></div></div>
+<div class="modal-bg" id="m-print" onclick="cM('m-print',event)"><div class="modal-box" onclick="event.stopPropagation()"><div class="modal-title"><span><i class="ti ti-printer" style="color:#0C447C;margin-right:6px"></i>Impression fiches palettes</span><span class="close-x" onclick="cM('m-print')">×</span></div><div id="print-c"></div></div></div>
+</div>
+
+<!-- Modal setup premier démarrage -->
+<div class="modal-bg" id="m-setup" style="display:none">
+  <div class="modal-box" style="max-width:500px;text-align:center" onclick="event.stopPropagation()">
+    <div style="font-size:40px;margin-bottom:12px">⚙️</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px">Initialisation requise</div>
+    <div style="font-size:14px;color:#888780;margin-bottom:20px;line-height:1.6">
+      La base de données n'est pas encore initialisée.<br>
+      <strong>Une seule étape :</strong> exécutez le script SQL dans Supabase.
+    </div>
+    <div style="background:#F1EFE8;border-radius:10px;padding:14px;margin-bottom:20px;text-align:left;font-size:13px">
+      <div style="font-weight:700;margin-bottom:8px;color:#BA7517">📋 Instructions :</div>
+      <div style="margin-bottom:6px">1. Allez sur <a href="https://supabase.com/dashboard/project/wdamusczimyepnrvyasi/sql/new" target="_blank" style="color:#BA7517;font-weight:700">Supabase SQL Editor →</a></div>
+      <div style="margin-bottom:6px">2. Copiez-collez ce script :</div>
+      <textarea readonly style="width:100%;height:120px;font-family:monospace;font-size:10px;padding:8px;border-radius:6px;border:0.5px solid #D4D2C9;resize:none;background:#fff" onclick="this.select()">-- ================================================================
+-- BMA Production — La Rose de Tunis
+-- Script SQL Supabase — à exécuter UNE SEULE FOIS
+-- Supabase &gt; SQL Editor &gt; New query &gt; coller &gt; Run
+-- ================================================================
+
+-- 1. Table principale de stockage des données
+CREATE TABLE IF NOT EXISTS bma_data (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id     TEXT NOT NULL,
+  key         TEXT NOT NULL,
+  value       JSONB NOT NULL DEFAULT '{}',
+  updated_at  TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (user_id, key)
+);
+
+-- 2. Index performance
+CREATE INDEX IF NOT EXISTS idx_bma_data_user_id ON bma_data(user_id);
+CREATE INDEX IF NOT EXISTS idx_bma_data_key ON bma_data(key);
+
+-- 3. Row Level Security — chaque utilisateur accède uniquement à ses données
+ALTER TABLE bma_data ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "select_own" ON bma_data;
+DROP POLICY IF EXISTS "insert_own" ON bma_data;
+DROP POLICY IF EXISTS "update_own" ON bma_data;
+DROP POLICY IF EXISTS "delete_own" ON bma_data;
+
+CREATE POLICY "select_own" ON bma_data
+  FOR SELECT USING (user_id = auth.uid()::text);
+
+CREATE POLICY "insert_own" ON bma_data
+  FOR INSERT WITH CHECK (user_id = auth.uid()::text);
+
+CREATE POLICY "update_own" ON bma_data
+  FOR UPDATE USING (user_id = auth.uid()::text);
+
+CREATE POLICY "delete_own" ON bma_data
+  FOR DELETE USING (user_id = auth.uid()::text);
+
+-- 4. Trigger mise à jour automatique du timestamp
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS bma_data_updated_at ON bma_data;
+CREATE TRIGGER bma_data_updated_at
+  BEFORE UPDATE ON bma_data
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ================================================================
+-- Vérification : doit retourner la table créée
+SELECT table_name, row_security
+FROM information_schema.tables
+WHERE table_name = 'bma_data';
+-- ================================================================
+</textarea>
+      <div style="margin-top:6px">3. Cliquez <strong>Run</strong></div>
+    </div>
+    <button class="btn btn-gold" style="padding:10px 24px;font-size:14px" onclick="retryDbLoad()">
+      <i class="ti ti-refresh"></i> J'ai exécuté le SQL — Réessayer
+    </button>
+  </div>
+</div>
+</div>
+
+<script>
+const { createClient } = supabase;
+
+// ── Clés Supabase stockées dans localStorage pour éviter de modifier le fichier
+const _LS_CONFIG = 'lrdt_sb_config';
+function getSBConfig(){
+  try{ return JSON.parse(localStorage.getItem(_LS_CONFIG)||'{}'); }catch(e){return {};}
+}
+function saveSBConfig(url, key){
+  localStorage.setItem(_LS_CONFIG, JSON.stringify({url, key}));
+}
+
+const _cfg = getSBConfig();
+const SUPABASE_URL = _cfg.url||'https://wdamusczimyepnrvyasi.supabase.co';
+const SUPABASE_ANON_KEY = _cfg.key||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkYW11c2N6aW15ZXBucnZ5YXNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzA5NTcsImV4cCI6MjA5NjE0Njk1N30.paYBR9kdx5_lxBOwc6-z8TYrDaoogI59qf5wtESxJtE';
+const _SB_CONFIGURED = true;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let orgId = null; // chaque user a son espace isolé
+
+// ════ AUTH ══════════════════════════════════════════════════════
+
+
+function skipToLocalMode(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  setDbBadge('err','Mode local');
+  _localLoad();
+  rAll();
+}
+
+function toggleSBConfig(){
+  const p=document.getElementById('sb-config-panel');
+  if(!p) return;
+  const open = p.style.display==='block';
+  p.style.display = open?'none':'block';
+  // Pre-fill if already configured
+  if(!open){
+    const cfg=getSBConfig();
+    if(cfg.url) document.getElementById('sb-url').value=cfg.url;
+    if(cfg.key) document.getElementById('sb-key').value=cfg.key;
+  }
+}
+function saveSBConfigAndReload(){
+  const url=(document.getElementById('sb-url')?.value||'').trim();
+  const key=(document.getElementById('sb-key')?.value||'').trim();
+  if(!url||!key){
+    alert('Renseignez les deux champs.');return;
+  }
+  if(!url.startsWith('https://')||!url.includes('supabase.co')){
+    alert('URL invalide. Format: https://xxxxxxxx.supabase.co');return;
+  }
+  if(!key.startsWith('eyJ')){
+    alert('Clé invalide. Elle doit commencer par eyJ...');return;
+  }
+  saveSBConfig(url,key);
+  location.reload();
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('field-confirm').style.display = tab==='signup'?'block':'none';
+  document.getElementById('auth-btn').textContent = tab==='signup'?'Créer le compte':'Se connecter';
+  document.getElementById('login-err').classList.remove('show');
+}
+
+async function doAuth(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const pass2 = document.getElementById('auth-pass2')?.value;
+  const isSignup = document.getElementById('tab-signup').classList.contains('active');
+  const errEl = document.getElementById('login-err');
+  errEl.classList.remove('show');
+
+  if(!email || !pass){ errEl.textContent='Remplissez email et mot de passe.'; errEl.classList.add('show'); return; }
+  if(isSignup && pass !== pass2){ errEl.textContent='Les mots de passe ne correspondent pas.'; errEl.classList.add('show'); return; }
+
+  document.getElementById('auth-btn').textContent = '...';
+  try {
+    let res;
+    if(isSignup){
+      res = await sb.auth.signUp({ email, password: pass });
+      if(res.error) throw res.error;
+      errEl.textContent = 'Compte créé ! Vérifiez votre email puis connectez-vous.';
+      errEl.style.background = '#EAF3DE'; errEl.style.color = '#27500A';
+      errEl.classList.add('show');
+      switchTab('login');
+    } else {
+      res = await sb.auth.signInWithPassword({ email, password: pass });
+      if(res.error) throw res.error;
+      // onAuthStateChange will handle the rest
+    }
+  } catch(e){
+    errEl.textContent = e.message || 'Erreur de connexion.';
+    errEl.classList.add('show');
+  }
+  document.getElementById('auth-btn').textContent = isSignup?'Créer le compte':'Se connecter';
+}
+
+async function doSignOut(){
+  await sb.auth.signOut();
+  currentUser = null; orgId = null;
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  setDbBadge('loading', 'Déconnecté');
+}
+
+if(sb){
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if(session?.user){
+      currentUser = session.user;
+      orgId = currentUser.id;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      setDbBadge('loading', 'Chargement...');
+      await dbLoad();
+      rAll();
+      setDbBadge('ok', currentUser.email.split('@')[0]);
+    } else {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('main-app').style.display = 'none';
+      setDbBadge('loading', 'Non connecté');
+    }
+  });
+} else {
+  // Supabase non configuré (ne devrait pas arriver)
+  setDbBadge('err', 'Erreur configuration');
+  console.error('Supabase non configuré');
+}
+
+function setDbBadge(state, text){
+  const el = document.getElementById('db-badge');
+  const el2 = document.getElementById('db-status-badge');
+  const cls = state==='ok'?'db-ok':state==='err'?'db-err':'db-loading';
+  const icon = state==='ok'?'ti-cloud-check':state==='err'?'ti-cloud-off':'ti-loader';
+  const html = `<i class="ti ${icon}" style="font-size:12px"></i>${text}`;
+  [el, el2].forEach(e=>{ if(e){ e.className='db-status '+cls; e.innerHTML=html; }});
+}
+
+// Keyboard enter on login
+['auth-email','auth-pass','auth-pass2'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
+});
+
+// ════ SUPABASE DB ════════════════════════════════════════════════
+// Schema utilisé (à créer dans Supabase) :
+//   table: bma_data
+//   columns: id (uuid pk), user_id (text), key (text), value (jsonb), updated_at (timestamptz)
+//   unique constraint: (user_id, key)
+//   RLS policy: user can only read/write rows where user_id = auth.uid()
+
+let dbSaveTimer = null;
+
+async function dbLoad(){
+  if(!orgId) return;
+  try {
+    // First attempt — if table doesn't exist, create it via SQL API
+    const { data, error } = await sb.from('bma_data')
+      .select('key, value')
+      .eq('user_id', orgId);
+    if(error){
+      if(error.message && (error.message.includes('does not exist') || error.code === '42P01')){
+        // Table doesn't exist — auto-create
+        setDbBadge('loading', 'Initialisation DB...');
+        await autoCreateSchema();
+        // Retry after creation
+        const retry = await sb.from('bma_data').select('key,value').eq('user_id', orgId);
+        if(retry.error) throw retry.error;
+        return _processLoadedData(retry.data||[]);
+      }
+      throw error;
+    }
+    _processLoadedData(data||[]);
+  } catch(e){
+    console.error('dbLoad error:', e);
+    setDbBadge('err', 'Erreur chargement — vérifiez la console');
+  }
+}
+
+function _processLoadedData(data){
+  if(!data.length){ console.log('Démarrage vierge'); return; }
+  const map = {};
+  data.forEach(row => { map[row.key] = row.value; });
+  if(map.ARTS && map.ARTS.length) ARTS = map.ARTS;
+  if(map.OPS && map.OPS.length) OPS = map.OPS;
+  if(map.EQ_DATA) Object.keys(map.EQ_DATA).forEach(k=>{ EQ_DATA[k]=map.EQ_DATA[k]; });
+  if(map.OFS) OFS = map.OFS;
+  if(map.STK) STK = map.STK;
+  if(map.PAL) PAL = map.PAL;
+  if(map.PCTRS) PCTRS = map.PCTRS;
+  if(map.EXP) EXP = map.EXP;
+  ARTS.forEach(a=>{
+    if(!PAL[a.id]) PAL[a.id]=[];
+    if(!STK[a.id]) STK[a.id]={total:0,lignes:[]};
+    if(PCTRS[a.id]===undefined){ const pals=PAL[a.id]||[]; PCTRS[a.id]=pals.length>0?Math.max(...pals.map(p=>p.palN||0)):0; }
+    if(EXP[a.id]===undefined) EXP[a.id]=false;
+  });
+  setDbBadge('ok','');
+}
+
+async function autoCreateSchema(){
+  console.warn('Table bma_data introuvable.');
+  setDbBadge('err', 'Initialisation requise');
+  // Show setup modal with SQL script embedded
+  const m = document.getElementById('m-setup');
+  if(m) m.style.display='flex';
+  throw new Error('Table manquante');
+}
+
+async function retryDbLoad(){
+  document.getElementById('m-setup').style.display='none';
+  setDbBadge('loading','Chargement...');
+  await dbLoad();
+  rAll();
+}
+
+
+async function dbSaveNow(){
+  if(!orgId){ _localSave(); return; }
+  try {
+    const tables = {ARTS, OPS, EQ_DATA, OFS, STK, PAL, PCTRS, EXP};
+    const upserts = Object.entries(tables).map(([key, value]) => ({
+      user_id: orgId,
+      key,
+      value,
+      updated_at: new Date().toISOString()
+    }));
+    const { error } = await sb.from('bma_data')
+      .upsert(upserts, { onConflict: 'user_id,key' });
+    if(error) throw error;
+    // Flash save indicator
+    const dot = document.getElementById('save-dot');
+    if(dot){ dot.classList.add('visible'); setTimeout(()=>dot.classList.remove('visible'),1200); }
+    setDbBadge('ok', currentUser?.email?.split('@')[0]||'');
+  } catch(e){
+    console.error('dbSave error:', e);
+    setDbBadge('err', 'Erreur sauvegarde');
+  }
+}
+
+function dbSave(){
+  clearTimeout(dbSaveTimer);
+  dbSaveTimer = setTimeout(dbSaveNow, 800);
+}
+
+
+// ════ LOCAL FALLBACK (mode démo sans Supabase) ═══════════════════
+const _LS_KEY = 'lrdt_bma_local';
+function _localSave(){
+  try {
+    const dot = document.getElementById('save-dot');
+    localStorage.setItem(_LS_KEY, JSON.stringify({ARTS,OPS,EQ_DATA,OFS,STK,PAL,PCTRS,EXP}));
+    if(dot){ dot.classList.add('visible'); setTimeout(()=>dot.classList.remove('visible'),1200); }
+  } catch(e){ console.warn('LocalStorage save error:', e); }
+}
+function _localLoad(){
+  try {
+    const raw = localStorage.getItem(_LS_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    if(d.ARTS&&d.ARTS.length) ARTS=d.ARTS;
+    if(d.OPS&&d.OPS.length) OPS=d.OPS;
+    if(d.EQ_DATA) Object.keys(d.EQ_DATA).forEach(k=>{EQ_DATA[k]=d.EQ_DATA[k];});
+    if(d.OFS) OFS=d.OFS;
+    if(d.STK) STK=d.STK;
+    if(d.PAL) PAL=d.PAL;
+    if(d.PCTRS) PCTRS=d.PCTRS;
+    if(d.EXP) EXP=d.EXP;
+    ARTS.forEach(a=>{
+      if(!PAL[a.id]) PAL[a.id]=[];
+      if(!STK[a.id]) STK[a.id]={total:0,lignes:[]};
+      if(PCTRS[a.id]===undefined){ const ps=PAL[a.id]||[]; PCTRS[a.id]=ps.length>0?Math.max(...ps.map(p=>p.palN||0)):0; }
+      if(EXP[a.id]===undefined) EXP[a.id]=false;
+    });
+  } catch(e){ console.warn('LocalStorage load error:', e); }
+}
+
+function clearData(){
+  if(!confirm('Effacer toutes les données ? Irréversible.')) return;
+  if(sb && orgId){
+    sb.from('bma_data').delete().eq('user_id', orgId).then(()=>{ location.reload(); });
+  } else {
+    localStorage.removeItem('lrdt_bma_local');
+    location.reload();
+  }
+}
+
+// Check Supabase connectivity on load
+(async ()=>{
+  try {
+    const { data } = await sb.auth.getSession();
+    if(!data?.session) setDbBadge('loading','Non connecté');
+    else setDbBadge('ok','Connecté');
+  } catch(e){ setDbBadge('err','Supabase inaccessible'); }
+})();
+
+const LP=['Entrepôt 4','Entrepôt 5'];
+const LS=[{id:'CF1',label:'CF1',desc:'CF1 ❄ Chambre froide 1',icon:'❄',cls:'l-froid'},{id:'CF2',label:'CF2',desc:'CF2 ❄ Chambre froide 2',icon:'❄',cls:'l-froid'},{id:'LOC1',label:'Local 1',desc:'Local 1 🌡 Sec',icon:'🌡',cls:'l-sec'}];
+const DLC=[{l:'1 mois',m:1},{l:'3 mois',m:3},{l:'6 mois',m:6},{l:'9 mois',m:9},{l:'1 an',m:12}];
+const MO=['M+1','M+2','M+3','M+4','M+5','M+6 (Pic)'];
+const MC={'M+1':{bg:'#E6F1FB',fg:'#0C447C'},'M+2':{bg:'#EAF3DE',fg:'#27500A'},'M+3':{bg:'#FAEEDA',fg:'#633806'},'M+4':{bg:'#F5C4B3',fg:'#4A1B0C'},'M+5':{bg:'#F7C1C1',fg:'#791F1F'},'M+6 (Pic)':{bg:'#FCEBEB',fg:'#A32D2D'}};
+const CC={'Pièce':{bg:'#EAF3DE',fg:'#27500A',ic:'ti-cookie',u:'pièce(s)'},'Plateau':{bg:'#FAEEDA',fg:'#633806',ic:'ti-layout-grid',u:'plateau(x)'},'Poids':{bg:'#E6F1FB',fg:'#0C447C',ic:'ti-scale',u:'kg'}};
+const SC={'Planifié':{bg:'#E6F1FB',fg:'#0C447C'},'En cours':{bg:'#FAEEDA',fg:'#633806'},'Terminé':{bg:'#EAF3DE',fg:'#27500A'},'Bloqué':{bg:'#FCEBEB',fg:'#A32D2D'}};
+const OPC=['#E6F1FB:#0C447C','#EAF3DE:#27500A','#FAEEDA:#633806','#F5C4B3:#4A1B0C','#F7C1C1:#791F1F','#FCEBEB:#A32D2D','#F1EFE8:#444441','#EEEDFE:#3C3489'];
+
+let ARTS=[
+  {id:'a1',n:'Briouette',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'10 pal',qtN:10,statut:'Planifié'},
+  {id:'a2',n:'CGT Amandes Effilées',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'80 pal',qtN:80,statut:'Planifié'},
+  {id:'a3',n:'Cornet Algérois Amande',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'30 pal',qtN:30,statut:'Planifié'},
+  {id:'a4',n:'Cornet Algérois Pistache',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'30 pal',qtN:30,statut:'Planifié'},
+  {id:'a5',n:'Cornet Pistache',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'20 pal',qtN:20,statut:'Planifié'},
+  {id:'a6',n:'Dziriette Pistache',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'10 pal',qtN:10,statut:'Planifié'},
+  {id:'a7',n:'Dziriette Amande',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'10 pal',qtN:10,statut:'Planifié'},
+  {id:'a8',n:'Marsa',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'25 pal',qtN:25,statut:'Planifié'},
+  {id:'a9',n:'Cigare Tunisien',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'20 pal',qtN:20,statut:'Planifié'},
+  {id:'a10',n:'Turban / Cigare',cat:'Plateau',mode:'Ambiant',mois:'M+1',qt:'8 pal',qtN:8,statut:'Planifié'},
+  {id:'a11',n:'Kataif',cat:'Plateau',mode:'Ambiant',mois:'M+1',qt:'25 pal',qtN:25,statut:'Planifié'},
+  {id:'a12',n:'Mini Kataif',cat:'Plateau',mode:'Ambiant',mois:'M+1',qt:'5 pal',qtN:5,statut:'Planifié'},
+  {id:'a13',n:'Coco Cerise',cat:'Pièce',mode:'Ambiant',mois:'M+2',qt:'15 pal',qtN:15,statut:'Planifié'},
+  {id:'a14',n:'Mehchi',cat:'Pièce',mode:'Ambiant',mois:'M+2',qt:'25 pal',qtN:25,statut:'Planifié'},
+  {id:'a15',n:'Coeur Amande',cat:'Pièce',mode:'Ambiant',mois:'M+2',qt:'20 pal',qtN:20,statut:'Planifié'},
+  {id:'a16',n:'Boule Choco',cat:'Pièce',mode:'Ambiant',mois:'M+3',qt:'3 pal',qtN:3,statut:'Planifié'},
+  {id:'a17',n:'Boule Pistache',cat:'Pièce',mode:'Ambiant',mois:'M+3',qt:'3 pal',qtN:3,statut:'Planifié'},
+  {id:'a18',n:'Zlabia',cat:'Poids',mode:'Froid',mois:'M+3',qt:'250 pal',qtN:250,statut:'Planifié'},
+  {id:'a19',n:'Mini Zlabia',cat:'Poids',mode:'Froid',mois:'M+3',qt:'20 pal',qtN:20,statut:'Planifié'},
+  {id:'a20',n:'Chabakia GM',cat:'Poids',mode:'Froid',mois:'M+3',qt:'60 pal',qtN:60,statut:'Planifié'},
+  {id:'a21',n:'Chabakia PM',cat:'Poids',mode:'Froid',mois:'M+3',qt:'35 pal',qtN:35,statut:'Planifié'},
+  {id:'a22',n:'CGM Amandes Effilées',cat:'Pièce',mode:'Ambiant',mois:'M+4',qt:'25 pal',qtN:25,statut:'Planifié'},
+  {id:'a23',n:'CGM Nature',cat:'Pièce',mode:'Ambiant',mois:'M+4',qt:'15 pal',qtN:15,statut:'Planifié'},
+  {id:'a24',n:'Harissa Ronde',cat:'Pièce',mode:'Ambiant',mois:'M+4',qt:'50 pal',qtN:50,statut:'Planifié'},
+  {id:'a25',n:'Sable',cat:'Pièce',mode:'Ambiant',mois:'M+4',qt:'10 pal',qtN:10,statut:'Planifié'},
+  {id:'a26',n:'Harissa Speciale',cat:'Plateau',mode:'Froid',mois:'M+4',qt:'150 pal',qtN:150,statut:'Planifié'},
+  {id:'a27',n:'Baklawa',cat:'Plateau',mode:'Froid',mois:'M+4',qt:'20 pal',qtN:20,statut:'Planifié'},
+  {id:'a28',n:'Istanbul',cat:'Plateau',mode:'Froid',mois:'M+4',qt:'5 pal',qtN:5,statut:'Planifié'},
+  {id:'a29',n:'Chamali',cat:'Plateau',mode:'Froid',mois:'M+4',qt:'3 pal',qtN:3,statut:'Planifié'},
+  {id:'a30',n:'Baklawa Tunisienne',cat:'Plateau',mode:'Froid',mois:'M+4',qt:'50 pal',qtN:50,statut:'Planifié'},
+  {id:'a31',n:'Yoyo GM',cat:'Pièce',mode:'Ambiant',mois:'M+5',qt:'2 pal',qtN:2,statut:'Planifié'},
+  {id:'a32',n:'Doigts',cat:'Poids',mode:'Froid',mois:'M+6 (Pic)',qt:'500 kg',qtN:500,statut:'Planifié'},
+  {id:'a33',n:'Banane',cat:'Poids',mode:'Froid',mois:'M+6 (Pic)',qt:'500 kg',qtN:500,statut:'Planifié'},
+  {id:'a34',n:'Yoyo',cat:'Poids',mode:'Froid',mois:'M+6 (Pic)',qt:'500 kg',qtN:500,statut:'Planifié'},
+];
+let EQ_DATA={'Entrepôt 4':{couleur:'#E6F1FB',couleurFg:'#0C447C',membres:['P1','P2','P3','P4']},'Entrepôt 5':{couleur:'#EAF3DE',couleurFg:'#27500A',membres:['P5','P6','P7','P8']}};
+let OPS=[
+  {id:'P1',nom:'Ahmed Khelifa',init:'AK',type:'perm',spec:'Pieces & cornets'},
+  {id:'P2',nom:'Karim Bouaziz',init:'KB',type:'perm',spec:'Baklawa & plateaux'},
+  {id:'P3',nom:'Yassine Trabelsi',init:'YT',type:'perm',spec:'Zlabia & poids'},
+  {id:'P4',nom:'Omar Saidi',init:'OS',type:'perm',spec:'Semi-finis'},
+  {id:'P5',nom:'Nadia Mansouri',init:'NM',type:'perm',spec:'Harissa & sable'},
+  {id:'P6',nom:'Fouad Rachdi',init:'FR',type:'perm',spec:'Plateau & finition'},
+  {id:'P7',nom:'Samir Lahmar',init:'SL',type:'perm',spec:'Chabakia & poids'},
+  {id:'P8',nom:'Imane Bettaieb',init:'IB',type:'perm',spec:'Pieces polyvalente'},
+  {id:'R1',nom:'Renfort 1',init:'R1',type:'renfort',spec:'Polyvalent'},
+  {id:'R2',nom:'Renfort 2',init:'R2',type:'renfort',spec:'Polyvalent'},
+  {id:'R3',nom:'Renfort 3',init:'R3',type:'renfort',spec:'Polyvalent'},
+  {id:'R4',nom:'Renfort 4',init:'R4',type:'renfort',spec:'Polyvalent'},
+];
+let OFS=[];let STK={};
+ARTS.forEach(a=>{STK[a.id]={total:0,lignes:[]};});
+let PAL={};let PCTRS={};let EXP={};
+ARTS.forEach(a=>{PAL[a.id]=[];PCTRS[a.id]=0;EXP[a.id]=false;});
+
+let TA=null,TS={},TSTEP=1,TD={};
+let RA=null,RS={};
+let PS={};
+let NDF_S=null;
+let NEW_STATUT='sf'; // choix SF ou FI dans le formulaire
+let SF_F={art:'',cat:'',statut:'',lieu:'',mois:''};
+
+// ═══ LOCALSTORAGE ═══════════════════════════════════════════════
+
+
+
+// REMOVED_scheduleSave
+
+// REMOVED_loadData
+
+// REMOVED_clearData
+
+// ═══ HELPERS ════════════════════════════════════════════════════
+function uid(){return 'x'+Date.now()+Math.floor(Math.random()*9999);}
+function gI(n){return n.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'??';}
+function gL(d){const x=new Date(d||Date.now());return 'LOT-'+String(x.getDate()).padStart(2,'0')+String(x.getMonth()+1).padStart(2,'0')+String(x.getFullYear()).slice(-2)+'-'+Math.floor(100+Math.random()*900);}
+function cDLC(d,m){const x=new Date(d||Date.now());x.setMonth(x.getMonth()+m);return x.toISOString().split('T')[0];}
+function fD(s){if(!s)return '—';try{return new Date(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'});}catch(e){return s;}}
+function fDl(s){if(!s)return '—';try{return new Date(s).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}}
+function fDL(s){if(!s)return '';try{return new Date(s).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}}
+function td(){return new Date().toISOString().split('T')[0];}
+function dU(s){if(!s)return null;return Math.round((new Date(s)-new Date())/86400000);}
+function iA(s){const j=dU(s);return j!==null&&j<30;}
+function dC(s){const j=dU(s);if(j===null)return '#888780';return j<7?'#A32D2D':j<14?'#C62828':j<30?'#E65100':'#27500A';}
+function pct(a,b){if(!b)return 0;return Math.min(100,Math.round(a/b*100));}
+function bc(p){return p>=100?'#639922':p>=50?'#BA7517':'#185FA5';}
+function gOC(id){const i=OPS.findIndex(o=>o.id===id)%OPC.length;const p=(OPC[Math.max(0,i)]||'#E6F1FB:#0C447C').split(':');return{bg:p[0],fg:p[1]};}
+function gO(id){return OPS.find(o=>o.id===id);}
+function gLieu(id){return LS.find(l=>l.id===id)||LS[2];}
+function gU(cat){return CC[cat]?.u||'unite(s)';}
+function gCC(cat){return CC[cat]||{bg:'#F1EFE8',fg:'#444441',ic:'ti-box',u:'unite(s)'};}
+function gMC(m){return MC[m]||{bg:'#F1EFE8',fg:'#444441'};}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/</g,'&lt;');}
+function gOFL(lieu){const eq=EQ_DATA[lieu];if(!eq)return OPS;return OPS.filter(o=>eq.membres.includes(o.id));}
+function gTS(id){return(STK[id]?.lignes||[]).reduce((s,l)=>s+l.qty,0);}
+function cM(id,e){if(!e||e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+
+// ═══ OF ═════════════════════════════════════════════════════════
+function addOF(){OFS.push({id:uid(),ofNum:OFS.length+1,date:td(),lieuprod:'Entrepôt 4',operateurs:[],produits:[],notes:'',confirme:false});rAll();}
+function delOF(id){OFS=OFS.filter(o=>o.id!==id);rAll();}
+function updOF(id,f,v){const o=OFS.find(x=>x.id===id);if(!o)return;if(f==='lieuprod')o.operateurs=[];o[f]=v;rAll();}
+function togOFOp(ofId,opId){const o=OFS.find(x=>x.id===ofId);if(!o)return;const i=o.operateurs.indexOf(opId);if(i>=0)o.operateurs.splice(i,1);else o.operateurs.push(opId);rAll();}
+function addProdOF(ofId){const of=OFS.find(x=>x.id===ofId);if(!of)return;of.produits.push({id:uid(),num:of.produits.length+1,artId:'',opId:'',qty:0,lot:gL(of.date),dlc:'',dlcMois:null,lieustockId:'LOC1'});rAll();}
+function delProdOF(ofId,pid){const of=OFS.find(x=>x.id===ofId);if(!of)return;const p=of.produits.find(x=>x.id===pid);if(p&&p.artId&&STK[p.artId]){STK[p.artId].lignes=STK[p.artId].lignes.filter(l=>!(l.lot===p.lot&&l.ofId===ofId));STK[p.artId].total=STK[p.artId].lignes.reduce((s,l)=>s+l.qty,0);}of.produits=of.produits.filter(x=>x.id!==pid);of.produits.forEach((x,i)=>x.num=i+1);rAll();}
+function updProdOF(ofId,pid,f,v){const of=OFS.find(x=>x.id===ofId);if(!of)return;const p=of.produits.find(x=>x.id===pid);if(!p)return;const oQ=p.qty||0;if(f==='qty')v=parseFloat(v)||0;p[f]=v;if(f==='artId'){const a=ARTS.find(x=>x.id===v);if(a){p.lieustockId=a.mode==='Froid'?'CF1':'LOC1';p.lot=gL(of.date);}}if(f==='qty'&&p.artId)syncSTK(ofId,pid,oQ,v);rAll();}
+function sDLCOF(ofId,pid,m){const of=OFS.find(x=>x.id===ofId);if(!of)return;const p=of.produits.find(x=>x.id===pid);if(!p)return;p.dlcMois=m;p.dlc=cDLC(of.date,m);if(STK[p.artId]){const l=STK[p.artId].lignes.find(x=>x.lot===p.lot&&x.ofId===ofId);if(l)l.dlc=p.dlc;}rAll();}
+function updLotOF(ofId,pid,v){const of=OFS.find(x=>x.id===ofId);if(!of)return;const p=of.produits.find(x=>x.id===pid);if(!p)return;const old=p.lot;p.lot=v;if(STK[p.artId]){const l=STK[p.artId].lignes.find(x=>x.lot===old&&x.ofId===ofId);if(l)l.lot=v;}rAll();}
+function syncSTK(ofId,pid,oQ,nQ){const of=OFS.find(x=>x.id===ofId);if(!of)return;const p=of.produits.find(x=>x.id===pid);if(!p||!p.artId)return;if(!STK[p.artId])STK[p.artId]={total:0,lignes:[]};const S=STK[p.artId];const l=S.lignes.find(x=>x.lot===p.lot&&x.ofId===ofId);if(l){l.qty=nQ;l.dlc=p.dlc;}else S.lignes.push({lot:p.lot,qty:nQ,dlc:p.dlc,lieu:p.lieustockId,date:of.date,ofId,pid,artId:p.artId,op:p.opId});S.total=S.lignes.reduce((s,x)=>s+x.qty,0);}
+function confOF(ofId){const of=OFS.find(x=>x.id===ofId);if(!of)return;of.produits.forEach(p=>{if(!p.artId||!p.qty)return;if(!STK[p.artId])STK[p.artId]={total:0,lignes:[]};const S=STK[p.artId];if(!S.lignes.find(l=>l.lot===p.lot&&l.ofId===ofId))S.lignes.push({lot:p.lot,qty:p.qty,dlc:p.dlc,lieu:p.lieustockId,date:of.date,ofId,pid:p.id,artId:p.artId,op:p.opId});S.total=S.lignes.reduce((s,x)=>s+x.qty,0);});of.confirme=true;rAll();}
+
+// ═══ PALETTES SUIVI ═════════════════════════════════════════════
+function addPalJ(artId,nb,date,dlcM,lieu,statut){
+  if(!PAL[artId])PAL[artId]=[];
+  if(!PCTRS[artId])PCTRS[artId]=0;
+  const art=ARTS.find(a=>a.id===artId);
+  const dL=lieu||(art&&art.mode==='Froid'?'CF1':'LOC1');
+  const isFini=statut==='fi';
+  // Lot logic: same day SF palettes share lot; Fini always unique
+  let lot,dlc,dlcMU;
+  if(!isFini){
+    const ex=PAL[artId].filter(p=>p.statut==='sf'&&p.date===date);
+    if(ex.length>0){lot=ex[0].lot;dlc=ex[0].dlc;dlcMU=ex[0].dlcMois;}
+    else{lot=gL(date);dlcMU=dlcM;dlc=dlcMU?cDLC(date,dlcMU):'';}
+  } else {
+    lot=gL(date);dlcMU=dlcM;dlc=dlcMU?cDLC(date,dlcMU):'';
+  }
+  for(let i=0;i<nb;i++){
+    PCTRS[artId]++;
+    const pal={id:uid(),palN:PCTRS[artId],artId,statut:isFini?'fi':'sf',lot:isFini?gL(date):lot,dlc,dlcMois:dlcMU,lieustockId:dL,date,lotFini:'',dlcFini:'',dlcMF:null,dateFini:''};
+    if(isFini){pal.lotFini=pal.lot;pal.lot='';pal.dlcFini=dlc;pal.dlc='';pal.dateFini=date;}
+    PAL[artId].push(pal);
+  }
+  EXP[artId]=true;rAll();
+}
+
+// Quick add: copy last palette of article, new lot (same-day logic)
+function quickAddPal(artId){
+  const pals=PAL[artId]||[];
+  const last=pals.length>0?pals[pals.length-1]:null;
+  const date=td();
+  const nb=1;
+  const dlcM=last?last.dlcMois:null;
+  const lieu=last?last.lieustockId:(ARTS.find(a=>a.id===artId)?.mode==='Froid'?'CF1':'LOC1');
+  const statut=last?last.statut:'sf';
+  addPalJ(artId,nb,date,dlcM,lieu,statut);
+}
+
+function delPal(artId,palId){PAL[artId]=(PAL[artId]||[]).filter(p=>p.id!==palId);rAll();}
+function updPal(artId,palId,f,v){const p=(PAL[artId]||[]).find(x=>x.id===palId);if(!p)return;if(f==='qtPal')v=parseFloat(v)||0;p[f]=v;rSuivi();dbSave();}
+function sDLCP(artId,palId,m,fi){const p=(PAL[artId]||[]).find(x=>x.id===palId);if(!p)return;const ref=fi?(p.dateFini||td()):p.date;if(fi){p.dlcMF=m;p.dlcFini=cDLC(ref,m);}else{p.dlcMois=m;p.dlc=cDLC(ref,m);}rSuivi();dbSave();}
+
+// ═══ TRANSFERT SF→FI ════════════════════════════════════════════
+function openTransf(artId){TA=artId;TS={};TSTEP=1;TD={};rTM();document.getElementById('m-transf').classList.add('open');}
+function togTS(palId){if(TS[palId])delete TS[palId];else TS[palId]=true;rTM();}
+function rTM(){
+  const art=ARTS.find(a=>a.id===TA);const pals=(PAL[TA]||[]).filter(p=>p.statut==='sf');const selP=pals.filter(p=>TS[p.id]);
+  if(TSTEP===1){
+    let h=`<div style="margin-bottom:12px;font-size:14px;font-weight:600;color:#888780">Article : <strong style="color:#2C2C2A">${art?art.n:'—'}</strong> · ${pals.length} palette${pals.length>1?'s':''} SF</div>`;
+    if(!pals.length){h+=`<div style="text-align:center;padding:1.5rem;color:#888780">Aucune palette SF.</div>`;document.getElementById('transf-c').innerHTML=h;return;}
+    h+=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">Cochez les palettes à passer en Fini :</div>`;
+    pals.forEach(p=>{const l=gLieu(p.lieustockId);const ck=!!TS[p.id];
+      h+=`<div class="ti-item${ck?' ck':''}" onclick="togTS('${p.id}')"><div class="ti-cb">${ck?'✓':''}</div><div class="sf-n" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">#${p.palN}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-family:monospace;font-size:12px;font-weight:700;color:#BA7517">${p.lot}</span><span style="font-size:12px;color:#888780">· ${fD(p.date)}</span><span class="pill ${l.cls}" style="font-size:10px">${l.icon} ${l.label}</span></div>${p.dlc?`<div style="font-size:11px;color:#888780;margin-top:2px">DLC SF: ${fD(p.dlc)}${iA(p.dlc)?` <span class="dlc-w">⚠</span>`:''}</div>`:''}</div></div>`;
+    });
+    h+=`<div style="margin-top:12px;padding:8px 12px;background:#EAF3DE;border-radius:8px;font-size:13px;color:#27500A;margin-bottom:14px">${selP.length} palette${selP.length>1?'s':''} sélectionnée${selP.length>1?'s':''}. Nouveau lot + DLC Fini à définir.</div>
+    <div style="display:flex;gap:8px"><button class="btn btn-green" style="flex:1;padding:10px" ${!selP.length?'disabled style="opacity:.4"':''} onclick="gTS2()"><i class="ti ti-arrow-right"></i>Suivant</button><button class="btn" onclick="cM('m-transf')">Annuler</button></div>`;
+    document.getElementById('transf-c').innerHTML=h;
+  } else {
+    let h=`<div style="font-size:14px;font-weight:600;margin-bottom:12px"><i class="ti ti-circle-check" style="color:#27500A;margin-right:6px"></i>Confirmer le transfert de ${selP.length} palette${selP.length>1?'s':''}</div>`;
+    selP.forEach(p=>{if(!TD[p.id])TD[p.id]={lot:gL(),dlcM:null,dlc:''};const td2=TD[p.id];const a2=ARTS.find(a=>a.id===TA);const iF=a2&&a2.mode==='Froid';
+      h+=`<div class="conf-pal"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div class="fi-n" style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">#${p.palN}</div><div><div style="font-size:13px;font-weight:700">${a2?a2.n:''} #${p.palN}</div><div style="font-size:12px;color:#888780">Lot SF: <span style="font-family:monospace">${p.lot}</span></div></div></div>
+      <div class="g2"><div class="fl"><span class="lbl">Nouveau lot Fini</span><input type="text" id="tl-${p.id}" value="${esc(td2.lot)}" onchange="TD['${p.id}'].lot=this.value" style="font-weight:700;font-family:monospace;font-size:12px"></div>
+      <div class="fl"><span class="lbl">DLC Fini ${iF?'❄':'🌡'}</span><div class="dlc-opts">${DLC.map(opt=>`<span class="dlc-opt${td2.dlcM===opt.m?' sel':''}" onclick="setTD('${p.id}',${opt.m})">${opt.l}</span>`).join('')}</div><div id="tdlc-${p.id}" style="font-size:12px;font-weight:700;color:${iF?'#0C447C':'#27500A'};margin-top:4px">${td2.dlc?`${iF?'❄':'🌡'} ${fD(td2.dlc)}`:'<span style="color:#A32D2D">⚠ A definir</span>'}</div></div></div></div>`;
+    });
+    h+=`<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-green" style="flex:1;padding:10px" onclick="finTransf()"><i class="ti ti-circle-check"></i>Confirmer</button><button class="btn btn-orange" onclick="TSTEP=1;rTM()"><i class="ti ti-arrow-left"></i>Retour</button><button class="btn" onclick="cM('m-transf')">Annuler</button></div>`;
+    document.getElementById('transf-c').innerHTML=h;
+  }
+}
+function gTS2(){const ids=Object.keys(TS);if(!ids.length)return;ids.forEach(id=>{if(!TD[id])TD[id]={lot:gL(),dlcM:null,dlc:''};});TSTEP=2;rTM();}
+function setTD(palId,m){if(!TD[palId])return;TD[palId].dlcM=m;TD[palId].dlc=cDLC(td(),m);rTM();}
+function finTransf(){const ids=Object.keys(TS);if(!TA||!ids.length)return;(PAL[TA]||[]).forEach(p=>{if(!TS[p.id])return;const t=TD[p.id]||{};p.statut='fi';p.lotFini=document.getElementById('tl-'+p.id)?.value||t.lot||gL();p.dlcFini=t.dlc||'';p.dlcMF=t.dlcM||null;p.dateFini=td();});cM('m-transf');rAll();}
+
+// ═══ RETOUR FI→SF ════════════════════════════════════════════════
+function openRetour(artId){RA=artId;RS={};rRM();document.getElementById('m-retour').classList.add('open');}
+function togRS(palId){if(RS[palId])delete RS[palId];else RS[palId]=true;rRM();}
+function rRM(){
+  const art=ARTS.find(a=>a.id===RA);const pals=(PAL[RA]||[]).filter(p=>p.statut==='fi');const selP=pals.filter(p=>RS[p.id]);
+  let h=`<div style="margin-bottom:12px;font-size:14px;font-weight:600;color:#888780">Article : <strong style="color:#2C2C2A">${art?art.n:'—'}</strong> · ${pals.length} palette${pals.length>1?'s':''} finies</div>`;
+  if(!pals.length){h+=`<div style="text-align:center;padding:1.5rem;color:#888780">Aucune palette finie.</div>`;document.getElementById('retour-c').innerHTML=h;return;}
+  h+=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">Cochez les palettes à repasser en SF :</div>`;
+  pals.forEach(p=>{const l=gLieu(p.lieustockId);const ck=!!RS[p.id];
+    h+=`<div class="ti-item${ck?' ck':''}" onclick="togRS('${p.id}')"><div class="ti-cb">${ck?'✓':''}</div><div class="fi-n" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">#${p.palN}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-family:monospace;font-size:12px;font-weight:700;color:#27500A">${p.lotFini||'—'}</span><span style="font-size:12px;color:#888780">· ${fD(p.dateFini)}</span><span class="pill ${l.cls}" style="font-size:10px">${l.icon} ${l.label}</span></div>${p.dlcFini&&iA(p.dlcFini)?`<div style="font-size:11px;margin-top:2px"><span class="dlc-w">⚠ DLC proche</span></div>`:''}</div></div>`;
+  });
+  h+=`<div style="margin-top:12px;padding:8px 12px;background:#FAEEDA;border-radius:8px;font-size:13px;color:#633806;margin-bottom:14px">${selP.length} palette${selP.length>1?'s':''} sélectionnée${selP.length>1?'s':''}. Retour au lot SF d'origine.</div>
+  <div style="display:flex;gap:8px"><button class="btn btn-orange" style="flex:1;padding:10px" ${!selP.length?'disabled style="opacity:.4"':''} onclick="finRetour()"><i class="ti ti-arrow-left"></i>Confirmer retour SF</button><button class="btn" onclick="cM('m-retour')">Annuler</button></div>`;
+  document.getElementById('retour-c').innerHTML=h;
+}
+function finRetour(){const ids=Object.keys(RS);if(!RA||!ids.length)return;(PAL[RA]||[]).forEach(p=>{if(!RS[p.id])return;p.statut='sf';p.lotFini='';p.dlcFini='';p.dlcMF=null;p.dateFini='';});cM('m-retour');rAll();}
+
+// ═══ IMPRESSION ═════════════════════════════════════════════════
+let PRINT_ART_FILTER=''; // '' = all, artId = specific
+function openPrint(artId){PS={};PRINT_ART_FILTER=artId||'';rPM();document.getElementById('m-print').classList.add('open');}
+function togPS(id){if(PS[id]!==undefined)delete PS[id];else PS[id]=1;rPM();}
+function setPQ(id,v){if(PS[id]!==undefined)PS[id]=Math.max(1,parseInt(v)||1);rPM();}
+function selAllPrint(){
+  const arts=PRINT_ART_FILTER?[ARTS.find(a=>a.id===PRINT_ART_FILTER)].filter(Boolean):ARTS;
+  arts.forEach(a=>{(PAL[a.id]||[]).forEach(p=>{if(PS[p.id]===undefined)PS[p.id]=1;});});rPM();
+}
+function rPM(){
+  const arts=PRINT_ART_FILTER?[ARTS.find(a=>a.id===PRINT_ART_FILTER)].filter(Boolean):ARTS;
+  const all=arts.flatMap(a=>(PAL[a.id]||[]).map(p=>({...p,art:a})));
+  if(!all.length){document.getElementById('print-c').innerHTML=`<div style="text-align:center;padding:1.5rem;color:#888780">Aucune palette.</div>`;return;}
+  const sc=Object.keys(PS).length;const te=Object.values(PS).reduce((s,n)=>s+n,0);
+  let h=`<div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#888780">Cochez les palettes + nombre d'exemplaires :</div>`;
+  arts.forEach(a=>{const pals=PAL[a.id]||[];if(!pals.length)return;const cc=gCC(a.cat);
+    h+=`<div style="font-size:12px;font-weight:700;color:${cc.fg};background:${cc.bg};padding:5px 10px;border-radius:8px;margin-bottom:6px;margin-top:10px">${a.n} · ${a.mois}</div>`;
+    pals.forEach(p=>{const fi=p.statut==='fi';const lot=fi?p.lotFini:p.lot;const dlc=fi?p.dlcFini:p.dlc;const l=gLieu(p.lieustockId);const ck=PS[p.id]!==undefined;
+      h+=`<div class="pr-item${ck?' ck':''}"><div class="pr-cb" onclick="togPS('${p.id}')">${ck?'✓':''}</div>
+      <div style="flex:1;cursor:pointer" onclick="togPS('${p.id}')"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span class="${fi?'fi-n':'sf-n'}" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">#${p.palN}</span>
+        <span class="pill" style="background:${fi?'#EAF3DE':'#FAEEDA'};color:${fi?'#27500A':'#633806'};font-size:10px">${fi?'Fini':'SF'}</span>
+        <span style="font-family:monospace;font-size:11px;font-weight:700">${lot||'—'}</span>
+        <span class="pill ${l.cls}" style="font-size:10px">${l.icon} ${l.label}</span>
+      </div>${dlc?`<div style="font-size:11px;color:${dC(dlc)};margin-top:2px">DLC: ${fD(dlc)}${iA(dlc)?' ⚠':''}</div>`:''}</div>
+      ${ck?`<div style="display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:8px"><span style="font-size:12px;color:#888780">Ex:</span><input type="number" min="1" value="${PS[p.id]||1}" onchange="setPQ('${p.id}',this.value)" style="width:52px;font-size:13px;font-weight:700;padding:5px 8px;text-align:center;border-radius:8px;border:0.5px solid #D4D2C9"></div>`:''}
+      </div>`;
+    });
+  });
+  h+=`<div style="margin-top:14px;padding:8px 12px;background:#F9F9F7;border-radius:8px;font-size:13px;margin-bottom:12px;display:flex;justify-content:space-between"><span>${sc} fiche${sc>1?'s':''}</span><span style="font-weight:700;color:#0C447C">${te} exemplaire${te>1?'s':''}</span></div>
+  <div style="display:flex;gap:8px"><button class="btn btn-blue" style="flex:1;padding:10px" ${!sc?'disabled style="opacity:.4"':''} onclick="doPrint()"><i class="ti ti-printer"></i>Imprimer</button><button class="btn btn-gold" style="padding:10px" onclick="selAllPrint()"><i class="ti ti-check"></i>Tout</button><button class="btn" onclick="cM('m-print')">Fermer</button></div>`;
+  document.getElementById('print-c').innerHTML=h;
+}
+function doPrint(){
+  const arts=PRINT_ART_FILTER?[ARTS.find(a=>a.id===PRINT_ART_FILTER)].filter(Boolean):ARTS;
+  const all=arts.flatMap(a=>(PAL[a.id]||[]).map(p=>({...p,art:a})));
+  const tp=all.filter(p=>PS[p.id]!==undefined);if(!tp.length)return;
+  let pages='';
+  tp.forEach(p=>{const nb=PS[p.id]||1;const fi=p.statut==='fi';const lot=fi?p.lotFini:p.lot;const dlc=fi?p.dlcFini:p.dlc;const l=gLieu(p.lieustockId);const iF=p.art&&p.art.mode==='Froid';const cc=gCC(p.art?.cat||'Pièce');
+    for(let ex=0;ex<nb;ex++){pages+=`<div class="page"><div class="hdr"><div style="display:flex;align-items:center;gap:14px"><div style="width:52px;height:52px;border-radius:50%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#BA7517">🌸</div><div><div style="font-size:21px;font-weight:700">La Rose de Tunis</div><div style="font-size:12px;color:#888780;margin-top:2px">Patisserie Orientale · Artisanale</div></div></div><div style="text-align:right"><div style="font-size:62px;font-weight:700;color:#BA7517;line-height:1">#${p.palN}</div><div style="font-size:13px;color:#888780;font-weight:600">Palette — ${p.art?.n||''}</div></div></div>
+    <div style="text-align:center;padding:13px;border-radius:12px;font-size:19px;font-weight:700;margin-bottom:18px;border:2px solid ${fi?'#C0DD97':'#FAC775'};background:${fi?'#EAF3DE':'#FAEEDA'};color:${fi?'#1a5c1a':'#7a4400'}">${fi?'✅ PRODUIT FINI — Pret a expedier':'⏳ SEMI-FINI — En cours de production'}</div>
+    <div style="background:#F9F6F0;border:2.5px solid #BA7517;border-radius:12px;padding:14px 20px;text-align:center;margin-bottom:18px"><div style="font-size:11px;font-weight:700;color:#888780;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">N de lot ${fi?'(Fini)':'(SF)'}</div><div style="font-size:40px;font-weight:700;font-family:'Courier New',monospace;color:#BA7517;letter-spacing:5px">${lot||'—'}</div>${fi&&p.lot?`<div style="font-size:12px;color:#888780;margin-top:6px">Lot SF: ${p.lot}</div>`:''}${nb>1?`<div style="font-size:11px;color:#888780;margin-top:4px">Ex ${ex+1}/${nb}</div>`:''}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+      <div style="background:#F9F9F7;border:1px solid #E0DDD4;border-radius:10px;padding:14px"><div style="font-size:11px;font-weight:700;color:#888780;text-transform:uppercase;margin-bottom:5px">Designation</div><div style="font-size:17px;font-weight:700">${p.art?.n||'—'}</div><div style="font-size:12px;color:#888780;margin-top:3px"><span style="background:${cc.bg};color:${cc.fg};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${p.art?.cat||''}</span> ${p.art?.mois||''}</div></div>
+      <div style="background:#F9F9F7;border:1px solid #E0DDD4;border-radius:10px;padding:14px"><div style="font-size:11px;font-weight:700;color:#888780;text-transform:uppercase;margin-bottom:5px">Lieu</div><div style="font-size:16px;font-weight:700">${l.icon} ${l.label}</div><div style="font-size:12px;color:#888780;margin-top:3px">${l.desc}</div></div>
+      <div style="background:#F9F9F7;border:1px solid #E0DDD4;border-radius:10px;padding:14px"><div style="font-size:11px;font-weight:700;color:#888780;text-transform:uppercase;margin-bottom:5px">Date production</div><div style="font-size:15px;font-weight:700">${new Date(p.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}</div>${fi?`<div style="font-size:12px;color:#27500A;margin-top:3px">Fini le ${fDl(p.dateFini)}</div>`:''}</div>
+      <div style="background:#F9F9F7;border:1px solid #E0DDD4;border-radius:10px;padding:14px"><div style="font-size:11px;font-weight:700;color:#888780;text-transform:uppercase;margin-bottom:5px">N palette</div><div style="font-size:36px;font-weight:700;color:#BA7517">#${p.palN}</div></div>
+    </div>
+    <div style="background:${iF?'#EFF6FC':'#F0FFF4'};border:2px solid ${iF?'#B5D4F4':'#C0DD97'};border-radius:12px;padding:14px 20px;text-align:center;margin-bottom:18px"><div style="font-size:12px;font-weight:700;color:${iF?'#0C447C':'#27500A'};text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${iF?'DLC — Conservation Froide':'DLC — Conservation Ambiante'}</div><div style="font-size:29px;font-weight:700;color:${iF?'#0C447C':'#27500A'}">${dlc?new Date(dlc).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'Non definie'}</div><div style="font-size:12px;color:${iF?'#4a7eaa':'#4a7a4a'};margin-top:4px">${iF?'Froid 4-6C':'Ambiant 18-22C'}</div></div>
+    <div style="margin-top:auto;border-top:1px solid #E0DDD4;padding-top:12px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:11px;color:#888780"><div>Fiche le ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div style="margin-top:3px">commande@larosedetunis.com · 01 46 06 15 25 · Paris 75018</div></div><div style="font-size:11px;color:#888780;text-align:right"><div>#${p.palN} — ${p.art?.n||''}</div><div style="font-family:monospace">${lot||'—'}</div></div></div>
+    </div>`;}
+  });
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fiches LRDT</title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Arial,sans-serif;font-size:13px;color:#2C2C2A;background:#fff}.page{width:210mm;height:297mm;padding:15mm 15mm 12mm;display:flex;flex-direction:column;page-break-after:always}.page:last-child{page-break-after:auto}.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:4px solid #BA7517;margin-bottom:18px}<\/style></head><body>${pages}</body></html>`);
+  w.document.close();setTimeout(()=>w.print(),600);cM('m-print');
+}
+
+// ═══ FILTRES SUIVI ═══════════════════════════════════════════════
+function applySFF(){
+  SF_F.art=document.getElementById('sff-art')?.value||'';
+  SF_F.cat=document.getElementById('sff-cat')?.value||'';
+  SF_F.statut=document.getElementById('sff-statut')?.value||'';
+  SF_F.lieu=document.getElementById('sff-lieu')?.value||'';
+  SF_F.mois=document.getElementById('sff-mois')?.value||'';
+  rSuiviBody();
+}
+function resetSFF(){
+  ['sff-art','sff-cat','sff-statut','sff-lieu','sff-mois'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  SF_F={art:'',cat:'',statut:'',lieu:'',mois:''};
+  rSuiviBody();
+}
+function artPF(art){
+  const pals=PAL[art.id]||[];
+  if(!pals.length)return false;
+  if(SF_F.art&&art.id!==SF_F.art)return false;
+  if(SF_F.cat&&art.cat!==SF_F.cat)return false;
+  if(SF_F.mois&&art.mois!==SF_F.mois)return false;
+  if(SF_F.lieu){
+    if(!pals.some(p=>p.lieustockId===SF_F.lieu))return false;
+  }
+  if(SF_F.statut==='sf'){if(!pals.some(p=>p.statut==='sf'))return false;}
+  if(SF_F.statut==='fi'){if(!pals.some(p=>p.statut==='fi'))return false;}
+  if(SF_F.statut==='alert'){if(!pals.some(p=>p.statut==='fi'&&iA(p.dlcFini)))return false;}
+  return true;
+}
+
+// ═══ FORM AJOUT PALETTE ═════════════════════════════════════════
+function showAFS(){document.getElementById('add-form-s').classList.add('open');const d=document.getElementById('snf-date');if(d&&!d.value)d.value=td();selStatut('sf');onSNFC();}
+function hideAFS(){document.getElementById('add-form-s').classList.remove('open');}
+function selStatut(s){
+  NEW_STATUT=s;
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('sel-sf','sel-fi'));
+  const el=document.getElementById('sc-'+s);if(el)el.classList.add('sel-'+s);
+  // Show/hide Fini-specific DLC section
+  const fiNote=document.getElementById('snf-fi-note');
+  if(fiNote)fiNote.style.display=s==='fi'?'block':'none';
+}
+function selSDlc(m){NDF_S=m;document.querySelectorAll('#snf-dlc .dlc-opt').forEach(el=>el.classList.toggle('sel',parseInt(el.getAttribute('data-m'))===m));const date=document.getElementById('snf-date')?.value||td();document.getElementById('snf-dlc-p').innerHTML=`→ DLC: <strong>${fD(cDLC(date,m))}</strong>`;onSNFC();}
+function onSNFC(){
+  const artId=document.getElementById('snf-art')?.value;const date=document.getElementById('snf-date')?.value||td();const nb=parseInt(document.getElementById('snf-nb')?.value)||1;
+  if(!artId){document.getElementById('snf-note').innerHTML='';return;}
+  const ex=(PAL[artId]||[]).filter(p=>p.statut==='sf'&&p.date===date);const nxt=(PCTRS[artId]||0)+1;
+  let note='';
+  if(NEW_STATUT==='sf'){
+    note=ex.length>0?`<i class="ti ti-link" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:#BA7517"></i><strong>${ex.length} palette(s) SF ce jour</strong> → lot hérité: <span style="font-family:monospace;font-weight:700">${ex[0].lot}</span>. Nums: <strong>#${nxt}</strong>${nb>1?' → <strong>#'+(nxt+nb-1)+'</strong>':''}.`
+    :`<i class="ti ti-tag" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:#BA7517"></i>Premier SF du jour → <strong>nouveau lot</strong>. Nums: <strong>#${nxt}</strong>${nb>1?' → <strong>#'+(nxt+nb-1)+'</strong>':''}.`;
+  } else {
+    note=`<i class="ti ti-circle-check" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:#27500A"></i>Palette Fini → <strong>lot unique</strong> généré. Num: <strong>#${nxt}</strong>${nb>1?' → <strong>#'+(nxt+nb-1)+'</strong>':''}.`;
+  }
+  document.getElementById('snf-note').innerHTML=note;
+}
+function confAPS(){
+  const artId=document.getElementById('snf-art')?.value;if(!artId)return;
+  const date=document.getElementById('snf-date')?.value||td();
+  const nb=Math.max(1,parseInt(document.getElementById('snf-nb')?.value)||1);
+  const lieu=document.getElementById('snf-lieu')?.value||'LOC1';
+  addPalJ(artId,nb,date,NDF_S,lieu,NEW_STATUT);
+  hideAFS();NDF_S=null;
+  document.querySelectorAll('#snf-dlc .dlc-opt').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('snf-dlc-p').innerHTML='';
+  if(document.getElementById('snf-nb'))document.getElementById('snf-nb').value='1';
+}
+
+// ═══ ARTICLES / EQUIPES ══════════════════════════════════════════
+function updArt(id,f,v){const a=ARTS.find(x=>x.id===id);if(a)a[f]=v;rAll();}
+function delArt(id){ARTS=ARTS.filter(a=>a.id!==id);delete STK[id];delete PAL[id];delete PCTRS[id];delete EXP[id];rAll();}
+function addArt(){const id=uid();ARTS.push({id,n:'Nouvel article',cat:'Pièce',mode:'Ambiant',mois:'M+1',qt:'0',qtN:0,statut:'Planifié'});STK[id]={total:0,lignes:[]};PAL[id]=[];PCTRS[id]=0;EXP[id]=false;rAll();}
+function cycStat(id){const cy=['Planifié','En cours','Terminé','Bloqué'];const a=ARTS.find(x=>x.id===id);if(!a)return;a.statut=cy[(cy.indexOf(a.statut||'Planifié')+1)%cy.length];rAll();}
+function togLM(lieu,opId){const eq=EQ_DATA[lieu];if(!eq)return;const i=eq.membres.indexOf(opId);if(i>=0)eq.membres.splice(i,1);else eq.membres.push(opId);rAll();}
+function updOp(id,f,v){const o=OPS.find(x=>x.id===id);if(!o)return;o[f]=v;if(f==='nom')o.init=gI(v);rAll();}
+function delOp(id){OPS=OPS.filter(o=>o.id!==id);Object.values(EQ_DATA).forEach(eq=>eq.membres=eq.membres.filter(m=>m!==id));rAll();}
+function addOp(type){const id=uid();const n=type==='perm'?'Patissier '+(OPS.filter(o=>o.type==='perm').length+1):'Renfort '+(OPS.filter(o=>o.type==='renfort').length+1);OPS.push({id,nom:n,init:gI(n),type,spec:'A definir'});rAll();}
+
+// ═══ RENDERS ═════════════════════════════════════════════════════
+function rKpis(){
+  const tSF=Object.values(PAL).flat().filter(p=>p.statut==='sf').length;
+  const tFI=Object.values(PAL).flat().filter(p=>p.statut==='fi').length;
+  const al=Object.values(PAL).flat().filter(p=>p.statut==='fi'&&iA(p.dlcFini)).length;
+  const tP=OFS.reduce((s,o)=>s+o.produits.length,0);
+  const done=ARTS.filter(a=>a.statut==='Terminé').length;
+  let h=`<div class="kpi"><div class="kpi-icon" style="background:#EAF3DE"><i class="ti ti-clipboard-list" style="color:#27500A"></i></div><div class="kpi-num" style="color:#27500A">${OFS.length}</div><div class="kpi-lbl">OF crées</div></div>
+  <div class="kpi"><div class="kpi-icon" style="background:#E6F1FB"><i class="ti ti-package" style="color:#185FA5"></i></div><div class="kpi-num" style="color:#185FA5">${tP}</div><div class="kpi-lbl">Produits OF</div></div>
+  <div class="kpi"><div class="kpi-icon" style="background:#FAEEDA"><i class="ti ti-clock" style="color:#BA7517"></i></div><div class="kpi-num" style="color:#BA7517">${tSF}</div><div class="kpi-lbl">Palettes SF</div></div>
+  <div class="kpi"><div class="kpi-icon" style="background:#EAF3DE"><i class="ti ti-circle-check" style="color:#639922"></i></div><div class="kpi-num" style="color:#639922">${tFI}</div><div class="kpi-lbl">Palettes Finies</div></div>
+  <div class="kpi"><div class="kpi-icon" style="background:#EAF3DE"><i class="ti ti-check" style="color:#27500A"></i></div><div class="kpi-num" style="color:#27500A">${done}</div><div class="kpi-lbl">Articles OK</div></div>
+  <div class="kpi"><div class="kpi-icon" style="background:#F1EFE8"><i class="ti ti-users" style="color:#444441"></i></div><div class="kpi-num">${OPS.length}</div><div class="kpi-lbl">Operateurs</div></div>`;
+  if(al)h+=`<div class="kpi" style="background:#FCEBEB;border-color:#F7C1C1"><div class="kpi-icon" style="background:#FCEBEB"><i class="ti ti-alert-triangle" style="color:#A32D2D"></i></div><div class="kpi-num" style="color:#A32D2D">${al}</div><div class="kpi-lbl" style="color:#A32D2D">DLC &lt;1m</div></div>`;
+  document.getElementById('kpis-bar').innerHTML=h;
+}
+
+function rOF(){
+  // Build filter bar state
+  const fDate=document.getElementById('of-f-date')?.value||'';
+  const fLieu=document.getElementById('of-f-lieu')?.value||'';
+  const fArt=document.getElementById('of-f-art')?.value||'';
+  const fStat=document.getElementById('of-f-stat')?.value||'';
+
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div class="sec-title" style="margin-bottom:0"><i class="ti ti-clipboard-list"></i>Ordres de fabrication</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${OFS.length?`<button class="btn" onclick="printOF()"><i class="ti ti-printer"></i>Imprimer</button>`:''}
+      <button class="btn btn-gold" onclick="addOF()"><i class="ti ti-plus"></i>Nouvel OF</button>
+    </div>
+  </div>
+  <!-- Filtres OF -->
+  <div class="filter-bar" style="margin-bottom:12px">
+    <div class="fl"><span class="lbl">Date</span><input type="date" id="of-f-date" value="${fDate}" onchange="rOF()"></div>
+    <div class="fl"><span class="lbl">Lieu</span>
+      <select id="of-f-lieu" onchange="rOF()">
+        <option value="">Tous les lieux</option>
+        ${LP.map(l=>`<option value="${l}" ${fLieu===l?'selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="fl" style="flex:2;min-width:140px"><span class="lbl">Produit</span>
+      <select id="of-f-art" onchange="rOF()">
+        <option value="">Tous les produits</option>
+        ${ARTS.map(a=>`<option value="${a.id}" ${fArt===a.id?'selected':''}>${a.n}</option>`).join('')}
+      </select>
+    </div>
+    <div class="fl"><span class="lbl">Statut</span>
+      <select id="of-f-stat" onchange="rOF()">
+        <option value="">Tous</option>
+        <option value="en-cours" ${fStat==='en-cours'?'selected':''}>En attente</option>
+        <option value="confirme" ${fStat==='confirme'?'selected':''}>Confirmés</option>
+      </select>
+    </div>
+    <button class="btn btn-red" style="align-self:flex-end;padding:7px 12px" onclick="resetOFFilters()"><i class="ti ti-x"></i>Réinit.</button>
+  </div>`;
+
+  if(!OFS.length){
+    h+=`<div style="text-align:center;padding:3rem;border:1.5px dashed #D4D2C9;border-radius:12px;color:#888780">
+      <i class="ti ti-clipboard-list" style="font-size:40px;display:block;margin-bottom:10px;color:#BA7517"></i>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">Aucun OF</div>
+      <button class="btn btn-gold" style="margin-top:8px" onclick="addOF()"><i class="ti ti-plus"></i>Créer</button>
+    </div>`;
+    document.getElementById('v-of').innerHTML=h;return;
+  }
+
+  // Filter OFS
+  let visOFS=OFS.filter(of=>{
+    if(fDate&&of.date!==fDate)return false;
+    if(fLieu&&of.lieuprod!==fLieu)return false;
+    if(fArt&&!of.produits.some(p=>p.artId===fArt))return false;
+    if(fStat==='confirme'&&!of.confirme)return false;
+    if(fStat==='en-cours'&&of.confirme)return false;
+    return true;
+  });
+
+  if(!visOFS.length){
+    h+=`<div style="text-align:center;padding:2rem;border:1.5px dashed #D4D2C9;border-radius:10px;color:#888780">
+      <i class="ti ti-search-off" style="font-size:32px;display:block;margin-bottom:8px"></i>
+      <div style="font-size:14px;font-weight:600">Aucun OF ne correspond aux filtres</div>
+    </div>`;
+    document.getElementById('v-of').innerHTML=h;return;
+  }
+
+  // Table view - one row per OF, expandable
+  h+=`<div style="border:0.5px solid #E0DDD4;border-radius:12px;overflow:hidden;background:#fff">
+    <div style="display:grid;grid-template-columns:90px 130px 1fr 1fr 80px 80px auto;gap:6px;padding:8px 14px;background:#F9F9F7;border-bottom:0.5px solid #E0DDD4;font-size:11px;font-weight:700;color:#888780;align-items:center">
+      <div>OF</div><div>Date</div><div>Lieu</div><div>Produits</div><div style="text-align:center">Qté tot.</div><div style="text-align:center">Statut</div><div></div>
+    </div>`;
+
+  visOFS.forEach(of=>{
+    const leq=EQ_DATA[of.lieuprod];
+    const tq=of.produits.reduce((s,p)=>s+(p.qty||0),0);
+    const arts=of.produits.map(p=>{const a=ARTS.find(x=>x.id===p.artId);return a?a.n:'?';}).filter(Boolean);
+    const artSummary=arts.length===0?'<span style="color:#aaa">Aucun produit</span>':arts.slice(0,3).map(n=>`<span style="background:#F1EFE8;color:#444441;font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap">${n}</span>`).join(' ')+( arts.length>3?` <span style="font-size:11px;color:#888780">+${arts.length-3}</span>`:'');
+    const isExp=document.getElementById('of-exp-'+of.id)?.classList.contains('open')||false;
+
+    h+=`<div style="display:grid;grid-template-columns:90px 130px 1fr 1fr 80px 80px auto;gap:6px;padding:9px 14px;border-bottom:0.5px solid #F0EEE8;align-items:center;cursor:pointer;background:#fff" onclick="togOFExp('${of.id}')" id="of-row-${of.id}">
+      <div><span style="background:#FAEEDA;color:#BA7517;font-size:12px;font-weight:700;padding:3px 9px;border-radius:8px">OF-${String(of.ofNum).padStart(3,'0')}</span></div>
+      <div style="font-size:13px;font-weight:600">${fD(of.date)}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="pill" style="background:${leq?leq.couleur:'#F1EFE8'};color:${leq?leq.couleurFg:'#444441'};font-size:11px">${of.lieuprod}</span>
+        ${of.notes?`<span style="font-size:11px;color:#888780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px" title="${esc(of.notes)}">📝 ${esc(of.notes)}</span>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${artSummary}</div>
+      <div style="text-align:center;font-weight:700;font-size:15px;color:${tq>0?'#639922':'#888780'}">${tq}</div>
+      <div style="text-align:center">${of.confirme?`<span class="pill" style="background:#EAF3DE;color:#27500A;font-size:10px"><i class="ti ti-circle-check" style="font-size:11px"></i>Confirmé</span>`:`<span class="pill" style="background:#E6F1FB;color:#0C447C;font-size:10px">En attente</span>`}</div>
+      <div style="display:flex;gap:5px;align-items:center" onclick="event.stopPropagation()">
+        <button class="btn btn-blue" style="padding:4px 8px;font-size:11px" onclick="printOneOF('${of.id}')" title="Imprimer cet OF"><i class="ti ti-printer"></i></button>
+        <i class="ti ti-chevron-right" id="of-arrow-${of.id}" style="font-size:14px;color:#888780;transition:transform .2s;cursor:pointer" onclick="togOFExp('${of.id}')"></i>
+      </div>
+    </div>
+    <!-- Detail expandable -->
+    <div id="of-exp-${of.id}" style="display:none;border-bottom:0.5px solid #E0DDD4;background:#FAFAF8;padding:14px 16px">
+      <div class="g2" style="margin-bottom:12px">
+        <div class="fl"><span class="lbl">Lieu de production</span>
+          <select onchange="updOF('${of.id}','lieuprod',this.value)">${LP.map(l=>`<option ${of.lieuprod===l?'selected':''}>${l}</option>`).join('')}</select>
+          ${leq?`<div style="margin-top:4px"><span class="pill" style="background:${leq.couleur};color:${leq.couleurFg};font-size:11px"><i class="ti ti-users" style="font-size:11px"></i>Equipe ${of.lieuprod}</span></div>`:''}
+        </div>
+        <div class="fl"><span class="lbl">Notes</span><input type="text" value="${esc(of.notes||'')}" placeholder="Instructions..." onchange="updOF('${of.id}','notes',this.value)"></div>
+      </div>
+      <!-- Présence -->
+      <div style="margin-bottom:12px">
+        <div class="lbl" style="margin-bottom:6px;font-size:13px"><i class="ti ti-user-check" style="font-size:14px;vertical-align:-2px;margin-right:5px;color:#BA7517"></i>Présence</div>
+        <div class="pres-grid">${gOFL(of.lieuprod).map(op=>{const sel=of.operateurs.includes(op.id);const c=gOC(op.id);return `<div class="pres-item${sel?' on':''}" onclick="togOFOp('${of.id}','${op.id}')"><div class="pres-cb">${sel?'✓':''}</div><div style="width:26px;height:26px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${op.init}</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${op.nom}</div><div style="font-size:11px;color:#888780">${op.spec}</div></div></div>`;}).join('')}</div>
+      </div>
+      <!-- Produits -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span class="lbl" style="margin:0;font-size:13px">Produits</span>
+          <div style="display:flex;gap:6px">
+            ${of.confirme?`<span class="pill" style="background:#EAF3DE;color:#27500A"><i class="ti ti-circle-check" style="font-size:13px"></i>Confirmé</span>`:`<button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="confOF('${of.id}')"><i class="ti ti-check"></i>Confirmer</button>`}
+            <button class="btn btn-gold" style="padding:5px 10px;font-size:12px" onclick="addProdOF('${of.id}')"><i class="ti ti-plus"></i>Ajouter</button>
+            <button class="btn btn-red" style="padding:5px 8px" onclick="delOF('${of.id}')"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>
+        ${!of.produits.length?`<div style="text-align:center;padding:14px;border:1.5px dashed #D4D2C9;border-radius:8px;color:#888780;font-size:13px">Cliquez "Ajouter" pour saisir un produit</div>`:''}
+        ${of.produits.map(prod=>{
+          const art=ARTS.find(a=>a.id===prod.artId);const u=art?gU(art.cat):'u';
+          const cc2=art?CC[art.cat]:{bg:'#F1EFE8',fg:'#444441',ic:'ti-box'};
+          const iF2=art&&art.mode==='Froid';const lieu=gLieu(prod.lieustockId);
+          const cib=art?art.qtN:0;const stk=gTS(prod.artId);
+          const opsP=OPS.filter(o=>of.operateurs.includes(o.id));
+          return `<div style="border:0.5px solid #E0DDD4;border-radius:8px;margin-bottom:6px;overflow:hidden;background:#fff">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#F9F9F7;border-bottom:0.5px solid #E0DDD4">
+              <div style="display:flex;align-items:center;gap:7px">
+                <div style="width:22px;height:22px;border-radius:5px;background:#BA7517;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${prod.num}</div>
+                ${art?`<span class="pill" style="background:${cc2.bg};color:${cc2.fg};font-size:10px"><i class="ti ${cc2.ic}" style="font-size:10px"></i>${art.cat}</span>`:''}
+                <span style="font-size:11px;font-weight:700;font-family:monospace;background:#F1EFE8;color:#888780;padding:2px 7px;border-radius:5px">${prod.lot}</span>
+              </div>
+              <button class="btn btn-red" style="padding:2px 7px;font-size:11px" onclick="delProdOF('${of.id}','${prod.id}')"><i class="ti ti-x"></i></button>
+            </div>
+            <div style="padding:10px;display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr;gap:8px;align-items:end">
+              <div class="fl"><span class="lbl">Produit</span>
+                <select onchange="updProdOF('${of.id}','${prod.id}','artId',this.value)">
+                  <option value="">— designation —</option>
+                  ${ARTS.map(a=>`<option value="${a.id}" ${prod.artId===a.id?'selected':''}>${a.n} · ${a.mois}</option>`).join('')}
+                </select></div>
+              <div class="fl"><span class="lbl">Opérateur</span>
+                <select onchange="updProdOF('${of.id}','${prod.id}','opId',this.value)">
+                  <option value="">— assigner —</option>
+                  ${(opsP.length>0?opsP:OPS).map(o=>`<option value="${o.id}" ${prod.opId===o.id?'selected':''}>${o.nom}</option>`).join('')}
+                </select></div>
+              <div class="fl"><span class="lbl">Qté (${u})</span>
+                <input type="number" min="0" value="${prod.qty||''}" placeholder="0" onchange="updProdOF('${of.id}','${prod.id}','qty',this.value)" style="font-size:15px;font-weight:700;text-align:right;border-color:${prod.qty>0?'#639922':'#D4D2C9'}"></div>
+              <div class="fl"><span class="lbl">Lieu stock</span>
+                <select onchange="updProdOF('${of.id}','${prod.id}','lieustockId',this.value)">${LS.map(l=>`<option value="${l.id}" ${prod.lieustockId===l.id?'selected':''}>${l.icon} ${l.label}</option>`).join('')}</select></div>
+            </div>
+            <div style="padding:0 10px 10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start">
+              <div class="fl"><span class="lbl">N° Lot</span>
+                <input type="text" value="${esc(prod.lot)}" onchange="updLotOF('${of.id}','${prod.id}',this.value)" style="font-weight:700;font-size:12px;font-family:monospace"></div>
+              <div class="fl"><span class="lbl">DLC ${iF2?'❄':'🌡'}</span>
+                <div class="dlc-opts">${DLC.map(opt=>`<span class="dlc-opt${prod.dlcMois===opt.m?' sel':''}" onclick="sDLCOF('${of.id}','${prod.id}',${opt.m})">${opt.l}</span>`).join('')}</div>
+                ${prod.dlc?`<div style="font-size:12px;font-weight:700;color:${iF2?'#0C447C':'#27500A'};margin-top:3px">${iF2?'❄':'🌡'} ${fD(prod.dlc)}</div>`:`<div style="font-size:11px;color:#888780;margin-top:3px">Choisir durée</div>`}
+              </div>
+            </div>
+            ${cib>0?`<div style="margin:0 10px 10px;display:flex;align-items:center;gap:8px;padding:5px 9px;border-radius:7px;background:#F9F9F7;font-size:12px;font-weight:600;flex-wrap:wrap"><span style="color:#888780">Cible: <strong style="color:#2C2C2A">${cib} ${u}</strong></span>·<span style="color:#185FA5">Stock: <strong>${stk}</strong></span>·<span style="color:${Math.max(0,cib-stk)===0?'#639922':'#BA7517'}">Restant: <strong>${Math.max(0,cib-stk)}</strong></span><div class="bar" style="flex:1;min-width:50px"><div class="bar-fill" style="width:${pct(stk,cib)}%;background:${bc(pct(stk,cib))}"></div></div><span style="color:${bc(pct(stk,cib))}">${pct(stk,cib)}%</span></div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  h+=`</div>`;
+  document.getElementById('v-of').innerHTML=h;
+
+  // Restore expand states
+  OFS.forEach(of=>{
+    const exp=document.getElementById('of-exp-'+of.id);
+    const arrow=document.getElementById('of-arrow-'+of.id);
+    if(_OF_EXP[of.id]){if(exp)exp.style.display='block';if(arrow)arrow.style.transform='rotate(90deg)';}
+  });
+}
+
+function resetOFFilters(){
+  ['of-f-date','of-f-lieu','of-f-art','of-f-stat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  rOF();
+}
+
+// Track OF expand state
+let _OF_EXP={};
+function togOFExp(ofId){
+  _OF_EXP[ofId]=!_OF_EXP[ofId];
+  const exp=document.getElementById('of-exp-'+ofId);
+  const arrow=document.getElementById('of-arrow-'+ofId);
+  if(exp)exp.style.display=_OF_EXP[ofId]?'block':'none';
+  if(arrow)arrow.style.transform=_OF_EXP[ofId]?'rotate(90deg)':'';
+}
+
+function rSuivi(){
+  const alertes=Object.values(PAL).flat().filter(p=>p.statut==='fi'&&iA(p.dlcFini));
+  let aH='';
+  if(alertes.length){
+    aH=`<div style="background:#FFF3E0;border:1.5px solid #FFB74D;border-radius:10px;padding:10px 14px;margin-bottom:14px"><div style="font-size:13px;font-weight:700;color:#E65100;margin-bottom:8px"><i class="ti ti-alert-triangle" style="font-size:15px;vertical-align:-2px;margin-right:5px"></i>⚠ ${alertes.length} palette${alertes.length>1?'s':''} finies DLC &lt; 1 mois:</div><div style="display:flex;flex-wrap:wrap;gap:6px">`;
+    alertes.forEach(p=>{const art=ARTS.find(a=>a.id===p.artId);const jr=dU(p.dlcFini);aH+=`<span style="background:${jr<7?'#FCEBEB':'#FFF3E0'};color:${jr<7?'#A32D2D':'#E65100'};border:1px solid ${jr<7?'#F7C1C1':'#FFB74D'};border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700">${art?art.n:'—'} #${p.palN} — DLC: ${fD(p.dlcFini)} (<strong>${jr}j</strong>)</span>`;});
+    aH+=`</div></div>`;
+  }
+  document.getElementById('v-suivi').innerHTML=`
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div class="sec-title"><i class="ti ti-chart-line"></i>Suivi stockage — palettes par article</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-purple" onclick="openPrint('')"><i class="ti ti-printer"></i>Imprimer fiches</button>
+      <button class="btn btn-gold" onclick="showAFS()"><i class="ti ti-plus"></i>Ajouter palette(s)</button>
+    </div>
+  </div>
+  ${aH}
+  <!-- FORMULAIRE AJOUT -->
+  <div class="add-form-s" id="add-form-s">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:14px;font-weight:700"><i class="ti ti-stack-2" style="color:#BA7517;margin-right:6px"></i>Nouvelle(s) palette(s)</span>
+      <button class="btn btn-red" style="padding:4px 9px" onclick="hideAFS()"><i class="ti ti-x"></i></button>
+    </div>
+    <!-- CHOIX SF / FINI -->
+    <div class="lbl" style="margin-bottom:6px">Type de palette</div>
+    <div class="statut-choice">
+      <div class="sc-btn" id="sc-sf" onclick="selStatut('sf')">⏳ Semi-fini</div>
+      <div class="sc-btn" id="sc-fi" onclick="selStatut('fi')">✅ Fini</div>
+    </div>
+    <div id="snf-fi-note" style="display:none;background:#EAF3DE;border-radius:8px;padding:8px 12px;font-size:13px;color:#27500A;margin-bottom:12px">
+      <i class="ti ti-info-circle" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>
+      Palette Fini : lot unique généré automatiquement. Définissez la DLC ci-dessous.
+    </div>
+    <div class="g3" style="margin-bottom:10px">
+      <div class="fl"><span class="lbl">Article</span><select id="snf-art" onchange="onSNFC()">${ARTS.map(a=>`<option value="${a.id}">${a.n} · ${a.mois}</option>`).join('')}</select></div>
+      <div class="fl"><span class="lbl">Date</span><input type="date" id="snf-date" value="${td()}" onchange="onSNFC()"></div>
+      <div class="fl"><span class="lbl">Nb palettes</span><input type="number" id="snf-nb" min="1" value="1" onchange="onSNFC()"></div>
+    </div>
+    <div class="g2" style="margin-bottom:10px">
+      <div class="fl"><span class="lbl">Lieu</span><select id="snf-lieu">${LS.map(l=>`<option value="${l.id}">${l.icon} ${l.label} — ${l.desc}</option>`).join('')}</select></div>
+      <div class="fl"><span class="lbl">DLC</span>
+        <div class="dlc-opts" id="snf-dlc">${DLC.map(opt=>`<span class="dlc-opt" data-m="${opt.m}" onclick="selSDlc(${opt.m})">${opt.l}</span>`).join('')}</div>
+        <div id="snf-dlc-p" style="font-size:12px;color:#888780;margin-top:4px"></div>
+      </div>
+    </div>
+    <div id="snf-note" style="font-size:12px;color:#888780;background:#fff;border:0.5px solid #E0DDD4;border-radius:8px;padding:8px 12px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-gold" onclick="confAPS()"><i class="ti ti-plus"></i>Créer</button>
+      <button class="btn" onclick="hideAFS()">Annuler</button>
+    </div>
+  </div>
+  <!-- FILTRES -->
+  <div class="filter-bar">
+    <div class="fl"><span class="lbl">Article</span><select id="sff-art" onchange="applySFF()"><option value="">Tous les articles</option>${ARTS.map(a=>`<option value="${a.id}">${a.n}</option>`).join('')}</select></div>
+    <div class="fl"><span class="lbl">Catégorie</span><select id="sff-cat" onchange="applySFF()"><option value="">Toutes</option><option value="Pièce">Pièce</option><option value="Plateau">Plateau</option><option value="Poids">Poids</option></select></div>
+    <div class="fl"><span class="lbl">Statut</span><select id="sff-statut" onchange="applySFF()"><option value="">Tous</option><option value="sf">Semi-finis</option><option value="fi">Finis</option><option value="alert">⚠ DLC &lt;1 mois</option></select></div>
+    <div class="fl"><span class="lbl">Lieu</span><select id="sff-lieu" onchange="applySFF()"><option value="">Tous les lieux</option>${LS.map(l=>`<option value="${l.id}">${l.icon} ${l.label}</option>`).join('')}</select></div>
+    <div class="fl"><span class="lbl">Mois</span><select id="sff-mois" onchange="applySFF()"><option value="">Tous</option>${MO.map(m=>`<option value="${m}">${m}</option>`).join('')}</select></div>
+    <button class="btn btn-red" style="align-self:flex-end;padding:7px 12px" onclick="resetSFF()"><i class="ti ti-x"></i>Réinit.</button>
+  </div>
+  <div style="font-size:13px;color:#888780;background:#F1EFE8;padding:8px 12px;border-radius:8px;margin-bottom:12px;display:flex;gap:6px">
+    <i class="ti ti-info-circle" style="font-size:15px;flex-shrink:0;color:#BA7517;margin-top:1px"></i>
+    <span>1 ligne/article. Numéros <strong>par article</strong>. Même jour SF = même lot. Clic pour détail palettes. <span style="color:#27500A;font-weight:700">●</span> = sauvegarde auto active.</span>
+  </div>
+  <div class="art-list-s">
+    <div class="art-list-hdr-s"><div></div><div>Article</div><div style="text-align:center">Pal. SF</div><div style="text-align:center">Pal. Finies</div><div style="text-align:center">Total / Cible</div><div>DLC prochaine SF</div><div>Alertes</div><div>Actions</div></div>
+    <div id="sf-body"></div>
+  </div>`;
+  selStatut('sf');
+  rSuiviBody();
+}
+
+function rSuiviBody(){
+  const body=document.getElementById('sf-body');if(!body)return;
+  const vis=ARTS.filter(art=>artPF(art));
+  if(!vis.length){
+    const totalPals=Object.values(PAL).flat().length;
+    body.innerHTML=`<div style="text-align:center;padding:2.5rem;color:#888780"><i class="ti ti-search-off" style="font-size:36px;display:block;margin-bottom:10px;color:#BA7517"></i><div style="font-size:15px;font-weight:700;margin-bottom:6px">${totalPals===0?'Aucune palette enregistrée':'Aucun résultat'}</div><div style="font-size:13px">${totalPals===0?'Cliquez "Ajouter palette(s)"':'Modifiez les filtres ou réinitialisez'}</div></div>`;
+    return;
+  }
+  let html='';
+  vis.forEach(art=>{html+=`<div id="sfr-${art.id}" class="art-row-s"></div><div class="pal-det-s${EXP[art.id]?' open':''}" id="sfd-${art.id}"></div>`;});
+  body.innerHTML=html;
+  vis.forEach(art=>{rSRow(art.id);if(EXP[art.id])rSDet(art.id);});
+}
+
+function rSRow(artId){
+  const el=document.getElementById('sfr-'+artId);if(!el)return;
+  const art=ARTS.find(a=>a.id===artId);if(!art)return;
+  const pals=PAL[artId]||[];
+  const sfP=pals.filter(p=>p.statut==='sf');
+  const fiP=pals.filter(p=>p.statut==='fi');
+  const cc=gCC(art.cat);const mc=gMC(art.mois);const iF=art.mode==='Froid';
+  const sDLC2=sfP.filter(p=>p.dlc).sort((a,b)=>new Date(a.dlc)-new Date(b.dlc))[0]?.dlc||'';
+  const jr=sDLC2?dU(sDLC2):null;const dc=jr!==null?dC(sDLC2):'#888780';
+  const fiA=fiP.filter(p=>iA(p.dlcFini));const hA=fiA.length>0;
+  const totalPal=sfP.length+fiP.length;
+  // Cible palettes depuis Articles (qtN)
+  const ciblePal=art.qtN||0;
+  const pctPal=ciblePal>0?Math.min(100,Math.round(totalPal/ciblePal*100)):null;
+  const isE=EXP[artId];
+  el.className=`art-row-s${hA?' has-alert':''}`;
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:center"><i class="ti ti-chevron-right" id="sfa-${artId}" style="font-size:14px;color:#888780;transition:transform .2s;${isE?'transform:rotate(90deg)':''}"></i></div>
+    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+      <span class="pill" style="background:${cc.bg};color:${cc.fg};font-size:11px"><i class="ti ${cc.ic}" style="font-size:11px"></i>${art.cat}</span>
+      <span style="font-weight:700">${art.n}</span>
+      <span class="pill" style="background:${mc.bg};color:${mc.fg};font-size:10px">${art.mois}</span>
+      <span style="font-size:12px;color:#888780">${iF?'❄':'🌡'}</span>
+    </div>
+    <div style="text-align:center">${sfP.length?`<span class="pill" style="background:#FAEEDA;color:#BA7517">${sfP.length}</span>`:'<span style="color:#888780;font-size:12px">—</span>'}</div>
+    <div style="text-align:center">${fiP.length?`<span class="pill" style="background:#EAF3DE;color:#27500A">${fiP.length}</span>`:'<span style="color:#888780;font-size:12px">—</span>'}</div>
+    <div style="text-align:center">
+      <div style="font-size:16px;font-weight:700;color:${pctPal!==null?bc(pctPal):'#2C2C2A'}">${totalPal}</div>
+      ${ciblePal>0?`<div style="font-size:10px;color:#888780">/ ${ciblePal} pal.</div>
+      <div style="margin-top:3px;height:5px;background:#E0DDD4;border-radius:3px;width:60px;margin-left:auto;margin-right:auto">
+        <div style="height:100%;border-radius:3px;background:${bc(pctPal)};width:${pctPal}%"></div>
+      </div>
+      <div style="font-size:10px;color:${bc(pctPal)};margin-top:1px;font-weight:700">${pctPal}%</div>`:''}
+    </div>
+    <div style="font-size:12px;color:${dc};font-weight:600">${sDLC2?`${fD(sDLC2)}<br><span style="font-size:11px">(${jr}j)</span>`:'—'}</div>
+    <div>${hA?`<span class="dlc-ap"><i class="ti ti-alert-triangle" style="font-size:12px"></i>${fiA.length} DLC proche</span>`:'<span style="font-size:12px;color:#888780">OK</span>'}</div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap" onclick="event.stopPropagation()">
+      <button class="btn" style="padding:4px 8px;font-size:11px;background:#F0FFF4;color:#27500A;border-color:#C0DD97" onclick="quickAddPal('${artId}')" title="+ 1 palette rapide"><i class="ti ti-plus"></i></button>
+      <button class="btn btn-orange" style="padding:4px 8px;font-size:11px" onclick="openTransf('${artId}')" title="SF→Fini"><i class="ti ti-arrow-right"></i></button>
+      <button class="btn btn-purple" style="padding:4px 8px;font-size:11px" onclick="openRetour('${artId}')" title="Retour Fini→SF"><i class="ti ti-arrow-left"></i></button>
+      <button class="btn btn-blue" style="padding:4px 8px;font-size:11px" onclick="openPrint('${artId}')" title="Imprimer fiches"><i class="ti ti-printer"></i></button>
+    </div>`;
+  el.onclick=()=>togE(artId);
+}
+
+function rSDet(artId){
+  const el=document.getElementById('sfd-'+artId);if(!el||!EXP[artId])return;
+  const art=ARTS.find(a=>a.id===artId);if(!art)return;
+  const pals=PAL[artId]||[];const sfP=pals.filter(p=>p.statut==='sf');const fiP=pals.filter(p=>p.statut==='fi');const iF=art.mode==='Froid';
+  const rSec=(sp,isFi)=>{if(!sp.length)return '';
+    let s=`<div class="pal-sec-t" style="color:${isFi?'#27500A':'#BA7517'};background:${isFi?'#EAF3DE22':'#FAEEDA22'}">${isFi?'✓ Palettes Finies':'⏳ Palettes SF'} — ${sp.length} palette${sp.length>1?'s':''}</div>
+    <div style="overflow-x:auto"><table class="pt"><thead><tr><th>N° (art.)</th><th>Statut</th><th>Lot</th><th>DLC</th><th>Lieu</th><th>Date</th><th>Actions</th></tr></thead><tbody>`;
+    sp.forEach(p=>{
+      const lot=isFi?p.lotFini:p.lot;const dlc=isFi?p.dlcFini:p.dlc;const dlcM=isFi?p.dlcMF:p.dlcMois;
+      const lO=gLieu(p.lieustockId);const jr=dlc?dU(dlc):null;const dc2=dlc?dC(dlc):'#888780';const sA=isFi&&iA(p.dlcFini);
+      s+=`<tr${sA?' style="background:#FFF9F0"':''}>
+        <td><div class="${isFi?'fi-n':'sf-n'}" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">#${p.palN}</div></td>
+        <td><span class="pill" style="background:${isFi?'#EAF3DE':'#FAEEDA'};color:${isFi?'#27500A':'#633806'};font-size:10px">${isFi?'Fini':'SF'}</span></td>
+        <td><input type="text" value="${esc(lot||'')}" onchange="updPal('${artId}','${p.id}','${isFi?'lotFini':'lot'}',this.value)" style="font-weight:700;font-size:11px;font-family:monospace;width:130px"></td>
+        <td>
+          <div class="dlc-opts" style="margin-bottom:3px">${DLC.map(opt=>`<span class="dlc-opt${dlcM===opt.m?' sel':''}" onclick="sDLCP('${artId}','${p.id}',${opt.m},${isFi})">${opt.l}</span>`).join('')}</div>
+          ${dlc?`<div style="font-size:12px;font-weight:700;color:${dc2};display:flex;align-items:center;gap:5px">${iF?'❄':'🌡'} ${fD(dlc)} (${jr}j)${sA?`<span class="dlc-w">⚠</span>`:''}</div>`:`<div style="font-size:11px;color:${isFi?'#A32D2D':'#888780'}">${isFi?'⚠ A definir':'Choisir'}</div>`}
+        </td>
+        <td><select onchange="updPal('${artId}','${p.id}','lieustockId',this.value)" style="font-size:11px;width:82px">${LS.map(l=>`<option value="${l.id}" ${p.lieustockId===l.id?'selected':''}>${l.icon} ${l.label}</option>`).join('')}</select></td>
+        <td style="font-size:12px;color:#888780;white-space:nowrap">${fD(p.date)}${isFi?`<br><span style="color:#27500A;font-size:11px">Fini ${fD(p.dateFini)}</span>`:''}${isFi&&p.lot?`<br><span style="font-family:monospace;font-size:10px;color:#aaa">SF:${p.lot.split('-').slice(-1)[0]}</span>`:''}</td>
+        <td><button class="btn btn-red" style="padding:4px 8px;font-size:11px" onclick="delPal('${artId}','${p.id}')"><i class="ti ti-trash"></i></button></td>
+      </tr>`;
+    });
+    s+=`</tbody></table></div>`;return s;
+  };
+  el.innerHTML=rSec(sfP,false)+rSec(fiP,true);
+}
+
+function togE(artId){
+  EXP[artId]=!EXP[artId];
+  const det=document.getElementById('sfd-'+artId);const arr=document.getElementById('sfa-'+artId);
+  if(arr)arr.style.transform=EXP[artId]?'rotate(90deg)':'';
+  if(det){det.classList.toggle('open',EXP[artId]);if(EXP[artId])rSDet(artId);}
+}
+
+function rProd(){
+  let h=`<div class="sec-title" style="margin-bottom:12px"><i class="ti ti-stack-2"></i>Prod</div>
+  <div class="filter-bar">
+    <div class="fl"><span class="lbl">Catégorie</span><select id="pf-cat" onchange="applyPF()"><option value="">Toutes</option><option>Pièce</option><option>Plateau</option><option>Poids</option></select></div>
+    <div class="fl" style="flex:2;min-width:140px"><span class="lbl">Article</span><select id="pf-art" onchange="applyPF()"><option value="">Tous</option>${ARTS.map(a=>`<option value="${a.id}">${a.n}</option>`).join('')}</select></div>
+    <div class="fl"><span class="lbl">Lieu prod.</span><select id="pf-lieu" onchange="applyPF()"><option value="">Tous</option>${LP.map(l=>`<option value="${l}">${l}</option>`).join('')}</select></div>
+    <div class="fl"><span class="lbl">Date début</span><input type="date" id="pf-d1" onchange="applyPF()"></div>
+    <div class="fl"><span class="lbl">Date fin</span><input type="date" id="pf-d2" onchange="applyPF()"></div>
+    <div class="fl" style="min-width:140px"><span class="lbl">Opérateur</span><select id="pf-op" onchange="applyPF()"><option value="">Tous</option>${OPS.map(o=>`<option value="${o.id}">${o.nom}</option>`).join('')}</select></div>
+    <button class="btn btn-red" style="align-self:flex-end;padding:7px 12px" onclick="rPFilt()"><i class="ti ti-x"></i>Réinit.</button>
+  </div><div id="prod-tw"></div>`;
+  document.getElementById('v-prod').innerHTML=h;applyPF();
+}
+
+function applyPF(){
+  const cat=document.getElementById('pf-cat')?.value||'';
+  const art=document.getElementById('pf-art')?.value||'';
+  const lieu=document.getElementById('pf-lieu')?.value||'';
+  const d1=document.getElementById('pf-d1')?.value||'';
+  const d2=document.getElementById('pf-d2')?.value||'';
+  const op=document.getElementById('pf-op')?.value||'';
+  let rows=[];
+  OFS.forEach(of=>{of.produits.forEach(p=>{
+    const a=ARTS.find(x=>x.id===p.artId);if(!a)return;
+    if(cat&&a.cat!==cat)return;
+    if(art&&p.artId!==art)return;
+    if(lieu&&of.lieuprod!==lieu)return;
+    if(d1&&of.date<d1)return;
+    if(d2&&of.date>d2)return;
+    if(op&&p.opId!==op)return;
+    rows.push({of,p,a});
+  });});
+  if(!rows.length){
+    document.getElementById('prod-tw').innerHTML=`<div style="text-align:center;padding:2rem;color:#888780;border:1.5px dashed #D4D2C9;border-radius:10px"><i class="ti ti-search-off" style="font-size:32px;display:block;margin-bottom:8px"></i>Aucun résultat</div>`;
+    return;
+  }
+  const grandTot=rows.reduce((s,r)=>s+(r.p.qty||0),0);
+  let h=`<div style="font-size:13px;font-weight:600;color:#888780;margin-bottom:10px">${rows.length} ligne${rows.length>1?'s':''} · <strong>${grandTot}</strong> unités produites</div>
+  <div class="tw"><table><thead><tr>
+    <th>OF</th><th>Date</th><th>Lieu prod.</th><th>Produit</th><th>Cat.</th><th>N° Lot</th><th>Qté produite</th><th>Unité</th><th>DLC</th><th>Lieu stock</th><th>Opérateur</th><th>Statut</th>
+  </tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const cc2=CC[r.a.cat]||{bg:'#F1EFE8',fg:'#444441'};
+    const op2=gO(r.p.opId);
+    const l=gLieu(r.p.lieustockId);
+    const dlcD=r.p.dlc?new Date(r.p.dlc):null;
+    const now=new Date();
+    const jr=dlcD?Math.round((dlcD-now)/86400000):null;
+    const dc=jr!==null?(jr<14?'#A32D2D':jr<30?'#633806':'#27500A'):'#888780';
+    h+=`<tr>
+      <td style="font-weight:700;color:#BA7517">OF-${String(r.of.ofNum).padStart(3,'0')}</td>
+      <td style="font-size:12px">${fD(r.of.date)}</td>
+      <td><span class="pill" style="background:#F1EFE8;color:#444441;font-size:11px">${r.of.lieuprod}</span></td>
+      <td style="font-weight:700">${r.a.n}</td>
+      <td><span class="pill" style="background:${cc2.bg};color:${cc2.fg}">${r.a.cat}</span></td>
+      <td style="font-family:monospace;font-size:11px;font-weight:600">${r.p.lot}</td>
+      <td style="text-align:right;font-weight:700;font-size:15px;color:${r.p.qty>0?'#639922':'#888780'}">${r.p.qty||0}</td>
+      <td style="font-size:12px;color:#888780">${gU(r.a.cat)}</td>
+      <td style="color:${dc};font-weight:600;font-size:12px">${fD(r.p.dlc)}${jr!==null?` <span style="font-size:10px">(${jr}j)</span>`:''}</td>
+      <td><span class="pill ${l.cls}" style="font-size:10px">${l.icon} ${l.label}</span></td>
+      <td style="font-size:12px">${op2?`<span style="background:${gOC(op2.id).bg};color:${gOC(op2.id).fg};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">${op2.nom}</span>`:'—'}</td>
+      <td><span class="pill" style="background:${r.of.confirme?'#EAF3DE':'#E6F1FB'};color:${r.of.confirme?'#27500A':'#0C447C'};font-size:10px">${r.of.confirme?'Confirmé':'En attente'}</span></td>
+    </tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  document.getElementById('prod-tw').innerHTML=h;
+}
+
+function rPFilt(){['pf-cat','pf-art','pf-lieu','pf-d1','pf-d2','pf-op'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});applyPF();}
+
+function rHist(){
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div class="sec-title"><i class="ti ti-history"></i>Historique</div>${OFS.length?`<button class="btn" onclick="printOF()"><i class="ti ti-printer"></i>Imprimer</button>`:''}</div>`;
+  if(!OFS.length){h+=`<div style="text-align:center;padding:3rem;border:1.5px dashed #D4D2C9;border-radius:12px;color:#888780"><i class="ti ti-history" style="font-size:40px;display:block;margin-bottom:10px"></i><div style="font-size:16px;font-weight:700">Historique vide</div></div>`;document.getElementById('v-historique').innerHTML=h;return;}
+  const dates=[...new Set(OFS.map(o=>o.date))].sort((a,b)=>b>a?1:-1);
+  dates.forEach(date=>{const ofs=OFS.filter(o=>o.date===date);const tq=ofs.reduce((s,o)=>o.produits.reduce((ss,p)=>ss+(p.qty||0),0)+s,0);const ops=[...new Set(ofs.flatMap(o=>o.operateurs))].map(id=>gO(id)).filter(Boolean);
+    h+=`<div style="margin-bottom:1.25rem"><div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:10px;margin-bottom:6px;background:#F9F9F7;border:0.5px solid #E0DDD4"><div style="width:40px;height:40px;border-radius:8px;background:#BA7517;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">${new Date(date).getDate()}</div><div style="flex:1"><div style="font-size:15px;font-weight:700">${fDL(date)}</div><div style="font-size:13px;color:#888780;margin-top:2px">${ofs.length} OF · ${tq} produits</div></div><div style="display:flex">${ops.slice(0,5).map(o=>{const c=gOC(o.id);return `<div style="width:28px;height:28px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid #fff;margin-left:-5px" title="${o.nom}">${o.init}</div>`;}).join('')}</div></div>
+    ${ofs.map(of=>`<div style="margin-left:16px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:#888780;padding:4px 0 4px 12px;border-left:2px solid #E0DDD4;margin-bottom:5px">OF-${String(of.ofNum).padStart(3,'0')} · ${of.lieuprod}${of.confirme?' · <span style="color:#27500A">✓</span>':''}</div>${of.produits.map(prod=>{const art=ARTS.find(a=>a.id===prod.artId);const l=gLieu(prod.lieustockId);const op2=gO(prod.opId);const cc2=art?CC[art.cat]:{bg:'#F1EFE8',fg:'#444441'};return `<div class="hist-row"><span style="background:#FAEEDA;color:#BA7517;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px">#${prod.num}</span><span style="font-weight:700;flex:1">${art?art.n:'—'}</span><span class="pill" style="background:${cc2.bg};color:${cc2.fg}">${art?art.cat:'—'}</span><span style="font-size:14px;font-weight:700;color:#639922">${prod.qty||0}</span><span class="pill ${l.cls}">${l.icon} ${l.label}</span>${op2?`<span style="font-size:12px;color:#888780">${op2.nom}</span>`:''}<span style="font-family:monospace;font-size:11px;color:#888780">${prod.lot}</span></div>`;}).join('')}</div>`).join('')}
+    </div>`;
+  });
+  document.getElementById('v-historique').innerHTML=h;
+}
+
+function rArts(){
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px"><div class="sec-title"><i class="ti ti-table"></i>Articles</div><button class="btn btn-gold" onclick="addArt()"><i class="ti ti-plus"></i>Ajouter</button></div><div class="tw"><table><thead><tr><th>Nom</th><th>Catégorie</th><th>Stockage</th><th>Mois</th><th>Cible pal.</th><th>Unité</th><th>Statut</th><th></th></tr></thead><tbody>`;
+  MO.forEach(m=>{const am=ARTS.filter(a=>a.mois===m);if(!am.length)return;const mc=MC[m];
+    h+=`<tr class="msep"><td colspan="8" style="background:${mc.bg};color:${mc.fg}">${m} — ${am.length} articles</td></tr>`;
+    am.forEach(a=>{const sc=SC[a.statut||'Planifié'];const cc2=CC[a.cat]||{};const stk=gTS(a.id);const p2=pct(stk,a.qtN);
+      h+=`<tr><td><input type="text" value="${esc(a.n)}" style="font-weight:700;font-size:14px" onchange="updArt('${a.id}','n',this.value)"></td><td><select onchange="updArt('${a.id}','cat',this.value)">${['Pièce','Plateau','Poids'].map(c=>`<option ${a.cat===c?'selected':''}>${c}</option>`).join('')}</select></td><td><select onchange="updArt('${a.id}','mode',this.value)">${['Ambiant','Froid'].map(x=>`<option value="${x}" ${a.mode===x?'selected':''}>${x==='Froid'?'❄ Froid':'🌡 Ambiant'}</option>`).join('')}</select></td><td><select onchange="updArt('${a.id}','mois',this.value)">${MO.map(x=>`<option ${a.mois===x?'selected':''}>${x}</option>`).join('')}</select></td><td>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+    <input type="number" min="0" value="${a.qtN||0}" onchange="updArt('${a.id}','qtN',parseInt(this.value)||0)" style="text-align:right;font-weight:700;width:65px" title="Cible en palettes">
+    <span style="font-size:12px;color:#888780">pal. cible</span>
+  </div>
+  ${(()=>{const palTot=(PAL[a.id]||[]).length;const p3=a.qtN>0?Math.min(100,Math.round(palTot/a.qtN*100)):0;return a.qtN>0?`<div style="display:flex;align-items:center;gap:5px"><div class="bar" style="flex:1"><div class="bar-fill" style="width:${p3}%;background:${bc(p3)}"></div></div><span style="font-size:11px;font-weight:700;color:${bc(p3)}">${palTot}/${a.qtN}</span></div>`:''})()}
+</td><td><span class="pill" style="background:${cc2.bg};color:${cc2.fg}">${gU(a.cat)}</span></td><td><span class="sbtn" style="background:${sc.bg};color:${sc.fg}" onclick="cycStat('${a.id}')">${a.statut||'Planifié'}</span></td><td><button class="btn btn-red" style="padding:4px 8px" onclick="delArt('${a.id}')"><i class="ti ti-trash"></i></button></td></tr>`;
+    });
+  });
+  h+=`</tbody></table></div>`;document.getElementById('v-articles').innerHTML=h;
+}
+
+function rEq(){
+  let h=`<div class="sec-title" style="margin-bottom:14px"><i class="ti ti-users"></i>Equipes</div>`;
+  LP.forEach(lieu=>{const eq=EQ_DATA[lieu];const mops=OPS.filter(o=>eq.membres.includes(o.id));
+    h+=`<div class="eq-lieu-block"><div class="eq-lieu-hdr" style="background:${eq.couleur};color:${eq.couleurFg}"><div style="display:flex;align-items:center;gap:8px"><i class="ti ti-building-factory" style="font-size:18px"></i><span style="font-size:15px;font-weight:700">${lieu}</span><span style="font-size:13px;opacity:.8">${mops.length} op.</span></div><div style="display:flex">${mops.map(o=>{const c=gOC(o.id);return `<div style="width:30px;height:30px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid ${eq.couleur};margin-left:-4px" title="${o.nom}">${o.init}</div>`;}).join('')}</div></div>
+    <div class="eq-lieu-body"><div style="font-size:12px;font-weight:700;color:#888780;margin-bottom:8px">Cliquez pour affecter/retirer</div><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">${OPS.map(op=>{const inEq=eq.membres.includes(op.id);const c=gOC(op.id);return `<span class="chip${inEq?' on':''}" style="background:${c.bg};color:${c.fg}" onclick="togLM('${lieu}','${op.id}')">${op.init} — ${op.nom}${op.type==='renfort'?' (R)':''}</span>`;}).join('')}</div>
+    <div class="eq-op-grid">${mops.map(o=>{const c=gOC(o.id);return `<div class="eq-op-card"><div style="width:34px;height:34px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-bottom:8px">${o.init}</div><span class="lbl">Nom</span><input type="text" value="${esc(o.nom)}" onchange="updOp('${o.id}','nom',this.value)" style="margin-bottom:6px;font-weight:700;font-size:13px"><span class="lbl">Spécialité</span><input type="text" value="${esc(o.spec)}" onchange="updOp('${o.id}','spec',this.value)" style="font-size:12px"></div>`;}).join('')}</div></div></div>`;
+  });
+  h+=`<div class="divider"></div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#888780;text-transform:uppercase">Tous les opérateurs</div><div style="display:flex;gap:6px"><button class="btn btn-gold" style="padding:5px 12px;font-size:12px" onclick="addOp('perm')"><i class="ti ti-plus"></i>+ Permanent</button><button class="btn" style="padding:5px 12px;font-size:12px" onclick="addOp('renfort')"><i class="ti ti-plus"></i>+ Renfort</button></div></div><div class="eq-op-grid">`;
+  OPS.forEach(o=>{const c=gOC(o.id);const lieux=LP.filter(l=>EQ_DATA[l]?.membres.includes(o.id));
+    h+=`<div class="eq-op-card" style="border-left:3px solid ${o.type==='renfort'?'#BA7517':'#0C447C'}"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:34px;height:34px;border-radius:50%;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${o.init}</div><span class="pill" style="background:${o.type==='renfort'?'#FAEEDA':'#E6F1FB'};color:${o.type==='renfort'?'#633806':'#0C447C'};font-size:10px">${o.type==='renfort'?'Renfort':'Permanent'}</span></div><span class="lbl">Nom</span><input type="text" value="${esc(o.nom)}" onchange="updOp('${o.id}','nom',this.value)" style="margin-bottom:6px;font-weight:700;font-size:13px"><span class="lbl">Spécialité</span><input type="text" value="${esc(o.spec)}" onchange="updOp('${o.id}','spec',this.value)" style="font-size:12px;margin-bottom:6px"><div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px">${lieux.length?lieux.map(l=>{const eq=EQ_DATA[l];return `<span class="pill" style="background:${eq.couleur};color:${eq.couleurFg};font-size:10px">${l}</span>`;}).join(''):`<span style="font-size:11px;color:#888780">Non affecté</span>`}</div><button class="btn btn-red" style="padding:3px 8px;font-size:11px;width:100%" onclick="delOp('${o.id}')"><i class="ti ti-trash"></i>Supprimer</button></div>`;
+  });
+  h+=`</div>`;document.getElementById('v-equipes').innerHTML=h;
+}
+
+function printOF(){
+  const w=window.open('','_blank');
+  let pages='';
+  OFS.forEach(of=>{
+    const dateStr=new Date(of.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const ofLabel='OF-'+String(of.ofNum).padStart(3,'0');
+    let rows='';
+    of.produits.forEach(prod=>{
+      const art=ARTS.find(a=>a.id===prod.artId);
+      const op=gO(prod.opId);
+      rows+=`<tr>
+        <td>${op?op.nom:'—'}</td>
+        <td style="font-weight:700">${art?art.n:'—'}</td>
+        <td style="text-align:center;font-weight:700;font-size:15px">${prod.qty||0} <span style="font-size:11px;font-weight:400">${art?gU(art.cat):''}</span></td>
+        <td style="font-family:monospace;font-size:11px">${prod.lot||'—'}</td>
+        <td>${fD(prod.dlc)||'—'}</td>
+        <td style="color:#888;font-size:11px"></td>
+      </tr>`;
+    });
+    if(!rows) rows='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:14px">Aucun produit saisi</td></tr>';
+    pages+=`<div class="of-page">
+      <div class="of-header">
+        <div class="of-meta">
+          <div class="of-num">${ofLabel}</div>
+          <div class="of-date">${dateStr}</div>
+          <div class="of-lieu"><span class="badge">${of.lieuprod}</span>${of.confirme?'<span class="badge-ok">✓ Confirmé</span>':''}</div>
+        </div>
+        <div class="of-logo">🌸 La Rose de Tunis</div>
+      </div>
+      ${of.notes?`<div class="of-notes"><strong>Notes :</strong> ${of.notes}</div>`:''}
+      <table>
+        <thead><tr>
+          <th>Opérateur</th>
+          <th>Produit</th>
+          <th style="text-align:center">Quantité</th>
+          <th>N° Lot</th>
+          <th>DLC</th>
+          <th>Remarque</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="of-footer">Fiche éditée le ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} &nbsp;·&nbsp; commande@larosedetunis.com &nbsp;·&nbsp; 01 46 06 15 25</div>
+    </div>`;
+  });
+  if(!pages) pages='<div style="padding:2rem;text-align:center;color:#aaa">Aucun OF à imprimer</div>';
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>OF La Rose de Tunis</title>
+  <style>
+    @page{size:A4 portrait;margin:0}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{font-family:Arial,sans-serif;font-size:13px;color:#2C2C2A;background:#fff}
+    .of-page{width:210mm;min-height:297mm;padding:14mm 14mm 10mm;display:flex;flex-direction:column;page-break-after:always}
+    .of-page:last-child{page-break-after:auto}
+    .of-header{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #BA7517;margin-bottom:16px}
+    .of-meta{flex:1}
+    .of-num{font-size:26px;font-weight:700;color:#BA7517;letter-spacing:1px}
+    .of-date{font-size:14px;font-weight:600;color:#2C2C2A;margin-top:4px;text-transform:capitalize}
+    .of-lieu{margin-top:6px;display:flex;align-items:center;gap:8px}
+    .badge{background:#F1EFE8;color:#444441;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #E0DDD4}
+    .badge-ok{background:#EAF3DE;color:#27500A;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #C0DD97}
+    .of-logo{font-size:16px;font-weight:700;color:#BA7517;text-align:right;white-space:nowrap}
+    .of-notes{background:#FFF9F0;border-left:3px solid #BA7517;padding:8px 12px;margin-bottom:14px;font-size:12px;border-radius:0 6px 6px 0}
+    table{width:100%;border-collapse:collapse;margin-bottom:auto}
+    th{font-size:12px;font-weight:700;color:#888780;padding:9px 10px;background:#F9F9F7;text-align:left;border-bottom:2px solid #E0DDD4;white-space:nowrap}
+    td{padding:10px 10px;border-bottom:1px solid #F0EEE8;vertical-align:middle;font-size:13px}
+    tr:nth-child(even) td{background:#FAFAF8}
+    tr:last-child td{border-bottom:2px solid #E0DDD4}
+    .of-footer{margin-top:14px;padding-top:10px;border-top:1px solid #E0DDD4;font-size:10px;color:#888780;text-align:center}
+  </style></head><body>${pages}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+function printOneOF(ofId){
+  const of=OFS.find(x=>x.id===ofId);if(!of)return;
+  const dateStr=new Date(of.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const ofLabel='OF-'+String(of.ofNum).padStart(3,'0');
+  let rows='';
+  of.produits.forEach(prod=>{
+    const art=ARTS.find(a=>a.id===prod.artId);
+    const op=gO(prod.opId);
+    rows+=`<tr>
+      <td>${op?op.nom:'—'}</td>
+      <td style="font-weight:700">${art?art.n:'—'}</td>
+      <td style="text-align:center;font-weight:700;font-size:15px">${prod.qty||0} <span style="font-size:11px;font-weight:400">${art?gU(art.cat):''}</span></td>
+      <td style="font-family:monospace;font-size:11px">${prod.lot||'—'}</td>
+      <td>${fD(prod.dlc)||'—'}</td>
+      <td style="color:#888;font-size:11px"></td>
+    </tr>`;
+  });
+  if(!rows)rows='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:14px">Aucun produit saisi</td></tr>';
+  const page=`<div class="of-page">
+    <div class="of-header">
+      <div class="of-meta">
+        <div class="of-num">${ofLabel}</div>
+        <div class="of-date">${dateStr}</div>
+        <div class="of-lieu"><span class="badge">${of.lieuprod}</span>${of.confirme?'<span class="badge-ok">✓ Confirmé</span>':''}</div>
+      </div>
+      <div class="of-logo">🌸 La Rose de Tunis</div>
+    </div>
+    ${of.notes?`<div class="of-notes"><strong>Notes :</strong> ${of.notes}</div>`:''}
+    <table>
+      <thead><tr>
+        <th>Opérateur</th><th>Produit</th><th style="text-align:center">Quantité</th><th>N° Lot</th><th>DLC</th><th>Remarque</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="of-footer">Fiche éditée le ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} &nbsp;·&nbsp; commande@larosedetunis.com &nbsp;·&nbsp; 01 46 06 15 25</div>
+  </div>`;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${ofLabel}</title>
+  <style>
+    @page{size:A4 portrait;margin:0}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{font-family:Arial,sans-serif;font-size:13px;color:#2C2C2A;background:#fff}
+    .of-page{width:210mm;min-height:297mm;padding:14mm 14mm 10mm;display:flex;flex-direction:column}
+    .of-header{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #BA7517;margin-bottom:16px}
+    .of-num{font-size:26px;font-weight:700;color:#BA7517;letter-spacing:1px}
+    .of-date{font-size:14px;font-weight:600;color:#2C2C2A;margin-top:4px;text-transform:capitalize}
+    .of-lieu{margin-top:6px;display:flex;align-items:center;gap:8px}
+    .badge{background:#F1EFE8;color:#444441;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #E0DDD4}
+    .badge-ok{background:#EAF3DE;color:#27500A;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid #C0DD97}
+    .of-logo{font-size:16px;font-weight:700;color:#BA7517;text-align:right;white-space:nowrap}
+    .of-notes{background:#FFF9F0;border-left:3px solid #BA7517;padding:8px 12px;margin-bottom:14px;font-size:12px;border-radius:0 6px 6px 0}
+    table{width:100%;border-collapse:collapse;margin-bottom:auto}
+    th{font-size:12px;font-weight:700;color:#888780;padding:9px 10px;background:#F9F9F7;text-align:left;border-bottom:2px solid #E0DDD4;white-space:nowrap}
+    td{padding:10px;border-bottom:1px solid #F0EEE8;vertical-align:middle;font-size:13px}
+    tr:nth-child(even) td{background:#FAFAF8}
+    tr:last-child td{border-bottom:2px solid #E0DDD4}
+    .of-footer{margin-top:14px;padding-top:10px;border-top:1px solid #E0DDD4;font-size:10px;color:#888780;text-align:center}
+  </style></head><body>${page}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+function rAll(){
+  rKpis();rOF();rSuivi();rProd();rHist();rArts();rEq();
+  dbSave();
+}
+
+// Navigation
+document.querySelectorAll('.nb').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.nb').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    const v=b.getAttribute('data-v');
+    if(v)document.getElementById('v-'+v)?.classList.add('active');
+  });
+});
+
+// Init : l'app démarre via onAuthStateChange (Supabase)
+// rAll() est appelé après dbLoad() une fois l'utilisateur connecté
+
+</script>
+</body>
+</html>
