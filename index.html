@@ -433,33 +433,28 @@ if(sb){
     setDbBadge('loading', 'Chargement...');
     await dbLoad();
     
-    // Force display before rendering
-    const mainApp = document.getElementById('main-app');
-    mainApp.style.display = 'block';
-    mainApp.style.visibility = 'visible';
+    // Show app
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
     
-    // Activate first tab immediately
+    // Activate first tab
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('v-of').classList.add('active');
     document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
     const ofBtn = document.querySelector('[data-v="of"]');
     if(ofBtn) ofBtn.classList.add('active');
     
-    // Use requestAnimationFrame to ensure DOM is painted before rendering
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        console.log('v-of exists:', !!document.getElementById('v-of'));
-        rKpis();
-        rOF();
-        rSuivi();
-        rProd();
-        rHist();
-        rArts();
-        rEq();
-        setDbBadge('ok', currentUser.email.split('@')[0]);
-        console.log('App ready! v-of length:', document.getElementById('v-of').innerHTML.length);
-      });
-    });
+    // Wait for DOM to be fully painted then render
+    setTimeout(()=>{
+      rKpis();
+      rOF();
+      rSuivi();
+      rProd();
+      rHist();
+      rArts();
+      rEq();
+      setDbBadge('ok', currentUser.email.split('@')[0]);
+    }, 300);
   });
 } else {
   // Supabase non configuré (ne devrait pas arriver)
