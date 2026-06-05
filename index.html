@@ -295,19 +295,9 @@ WHERE table_name = 'bma_data';
 <script>
 const { createClient } = supabase;
 
-// ── Clés Supabase stockées dans localStorage pour éviter de modifier le fichier
-const _LS_CONFIG = 'lrdt_sb_config';
-function getSBConfig(){
-  try{ return JSON.parse(localStorage.getItem(_LS_CONFIG)||'{}'); }catch(e){return {};}
-}
-function saveSBConfig(url, key){
-  localStorage.setItem(_LS_CONFIG, JSON.stringify({url, key}));
-}
-
-const _cfg = getSBConfig();
-const SUPABASE_URL = _cfg.url||'https://wdamusczimyepnrvyasi.supabase.co';
-const SUPABASE_ANON_KEY = _cfg.key||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkYW11c2N6aW15ZXBucnZ5YXNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzA5NTcsImV4cCI6MjA5NjE0Njk1N30.paYBR9kdx5_lxBOwc6-z8TYrDaoogI59qf5wtESxJtE';
-const _SB_CONFIGURED = true;
+// Configuration Supabase — clés hardcodées
+const SUPABASE_URL = 'https://wdamusczimyepnrvyasi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkYW11c2N6aW15ZXBucnZ5YXNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzA5NTcsImV4cCI6MjA5NjE0Njk1N30.paYBR9kdx5_lxBOwc6-z8TYrDaoogI59qf5wtESxJtE';
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
