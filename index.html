@@ -412,35 +412,44 @@ async function doSignOut(){
 if(sb){
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth event:', event, session?.user?.email);
-    if(session?.user){
-      currentUser = session.user;
-      orgId = currentUser.id;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('main-app').style.display = 'block';
-      setDbBadge('loading', 'Chargement...');
-      try {
-        await dbLoad();
-      } catch(e) {
-        console.error('dbLoad failed:', e);
-      }
-      try {
-        rAll();
-      } catch(e) {
-        console.error('rAll failed:', e);
-      }
-      // Ensure first panel is visible
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      const firstPanel = document.getElementById('v-of');
-      if(firstPanel) firstPanel.classList.add('active');
-      document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
-      const firstBtn = document.querySelector('.nb[data-v="of"]');
-      if(firstBtn) firstBtn.classList.add('active');
-      setDbBadge('ok', currentUser.email.split('@')[0]);
-    } else {
+    
+    if(event === 'SIGNED_OUT'){
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('main-app').style.display = 'none';
       setDbBadge('loading', 'Non connecté');
+      return;
     }
+    
+    if(!session?.user) return;
+    
+    currentUser = session.user;
+    orgId = currentUser.id;
+    
+    // Show app immediately
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    
+    // Load data from DB
+    setDbBadge('loading', 'Chargement...');
+    await dbLoad();
+    
+    // Render all panels
+    rKpis();
+    rOF();
+    rSuivi();
+    rProd();
+    rHist();
+    rArts();
+    rEq();
+    
+    // Activate first tab
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('v-of').classList.add('active');
+    document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+    document.querySelector('[data-v="of"]').classList.add('active');
+    
+    setDbBadge('ok', currentUser.email.split('@')[0]);
+    console.log('App ready!');
   });
 } else {
   // Supabase non configuré (ne devrait pas arriver)
@@ -1583,7 +1592,13 @@ function printOneOF(ofId){
 }
 
 function rAll(){
-  rKpis();rOF();rSuivi();rProd();rHist();rArts();rEq();
+  try{ rKpis(); }catch(e){ console.error('rKpis:',e); }
+  try{ rOF(); }catch(e){ console.error('rOF:',e); }
+  try{ rSuivi(); }catch(e){ console.error('rSuivi:',e); }
+  try{ rProd(); }catch(e){ console.error('rProd:',e); }
+  try{ rHist(); }catch(e){ console.error('rHist:',e); }
+  try{ rArts(); }catch(e){ console.error('rArts:',e); }
+  try{ rEq(); }catch(e){ console.error('rEq:',e); }
   dbSave();
 }
 
