@@ -197,7 +197,7 @@ input:focus,select:focus{outline:2px solid #BA7517;outline-offset:-1px;border-co
     <button class="nb" data-v="historique"><i class="ti ti-history"></i>Historique</button>
     <button class="nb" data-v="articles"><i class="ti ti-table"></i>Articles</button>
     <button class="nb" data-v="equipes"><i class="ti ti-users"></i>Equipes</button>
-    <span id="db-badge" class="db-status db-loading" style="font-size:11px"><i class="ti ti-loader" style="font-size:11px"></i>...</span><button class="btn btn-red" style="padding:5px 10px;font-size:12px" onclick="doSignOut()" title="Se déconnecter"><i class="ti ti-logout"></i></button>
+    <span id="db-badge" class="db-status db-loading" style="font-size:11px"><i class="ti ti-loader" style="font-size:11px"></i>Connexion...</span><button class="btn btn-red" style="padding:5px 10px;font-size:12px" onclick="doSignOut()" title="Se déconnecter"><i class="ti ti-logout"></i></button>
   </div>
 </div>
 <div class="kpis" id="kpis-bar"></div>
@@ -433,23 +433,23 @@ if(sb){
     setDbBadge('loading', 'Chargement...');
     await dbLoad();
     
-    // Render all panels
-    rKpis();
-    rOF();
-    rSuivi();
-    rProd();
-    rHist();
-    rArts();
-    rEq();
-    
-    // Activate first tab
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById('v-of').classList.add('active');
-    document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-    document.querySelector('[data-v="of"]').classList.add('active');
-    
-    setDbBadge('ok', currentUser.email.split('@')[0]);
-    console.log('App ready!');
+    // Small delay to ensure DOM is fully ready
+    setTimeout(()=>{
+      rKpis();
+      rOF();
+      rSuivi();
+      rProd();
+      rHist();
+      rArts();
+      rEq();
+      // Activate first tab
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('v-of').classList.add('active');
+      document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+      document.querySelector('[data-v="of"]').classList.add('active');
+      setDbBadge('ok', currentUser.email.split('@')[0]);
+      console.log('App ready! v-of length:', document.getElementById('v-of').innerHTML.length);
+    }, 100);
   });
 } else {
   // Supabase non configuré (ne devrait pas arriver)
@@ -462,8 +462,10 @@ function setDbBadge(state, text){
   const el2 = document.getElementById('db-status-badge');
   const cls = state==='ok'?'db-ok':state==='err'?'db-err':'db-loading';
   const icon = state==='ok'?'ti-cloud-check':state==='err'?'ti-cloud-off':'ti-loader';
-  const html = `<i class="ti ${icon}" style="font-size:12px"></i>${text}`;
-  [el, el2].forEach(e=>{ if(e){ e.className='db-status '+cls; e.innerHTML=html; }});
+  const html = `<i class="ti ${icon}" style="font-size:12px"></i>${text||''}`;
+  if(el){ el.className='db-status '+cls; el.innerHTML=html; }
+  if(el2){ el2.className='db-status '+cls; el2.innerHTML=html; }
+  console.log('Badge:', state, text);
 }
 
 // Keyboard enter on login
