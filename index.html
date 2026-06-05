@@ -417,13 +417,11 @@ if(sb){
       orgId = currentUser.id;
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('main-app').style.display = 'block';
-      if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED'){
-        setDbBadge('loading', 'Chargement...');
-        await dbLoad();
-        rAll();
-      }
+      setDbBadge('loading', 'Chargement...');
+      await dbLoad();
+      rAll();
       setDbBadge('ok', currentUser.email.split('@')[0]);
-    } else if(event === 'SIGNED_OUT' || event === 'INITIAL_SESSION'){
+    } else {
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('main-app').style.display = 'none';
       setDbBadge('loading', 'Non connecté');
@@ -461,26 +459,18 @@ let dbSaveTimer = null;
 async function dbLoad(){
   if(!orgId) return;
   try {
-    // First attempt — if table doesn't exist, create it via SQL API
     const { data, error } = await sb.from('bma_data')
       .select('key, value')
       .eq('user_id', orgId);
     if(error){
-      if(error.message && (error.message.includes('does not exist') || error.code === '42P01')){
-        // Table doesn't exist — auto-create
-        setDbBadge('loading', 'Initialisation DB...');
-        await autoCreateSchema();
-        // Retry after creation
-        const retry = await sb.from('bma_data').select('key,value').eq('user_id', orgId);
-        if(retry.error) throw retry.error;
-        return _processLoadedData(retry.data||[]);
-      }
-      throw error;
+      console.error('dbLoad error:', error);
+      setDbBadge('err', 'Erreur: ' + (error.message||error.code||'inconnue'));
+      return;
     }
     _processLoadedData(data||[]);
   } catch(e){
-    console.error('dbLoad error:', e);
-    setDbBadge('err', 'Erreur chargement — vérifiez la console');
+    console.error('dbLoad exception:', e);
+    setDbBadge('err', 'Erreur chargement');
   }
 }
 
