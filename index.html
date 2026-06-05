@@ -433,23 +433,33 @@ if(sb){
     setDbBadge('loading', 'Chargement...');
     await dbLoad();
     
-    // Small delay to ensure DOM is fully ready
-    setTimeout(()=>{
-      rKpis();
-      rOF();
-      rSuivi();
-      rProd();
-      rHist();
-      rArts();
-      rEq();
-      // Activate first tab
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      document.getElementById('v-of').classList.add('active');
-      document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-      document.querySelector('[data-v="of"]').classList.add('active');
-      setDbBadge('ok', currentUser.email.split('@')[0]);
-      console.log('App ready! v-of length:', document.getElementById('v-of').innerHTML.length);
-    }, 100);
+    // Force display before rendering
+    const mainApp = document.getElementById('main-app');
+    mainApp.style.display = 'block';
+    mainApp.style.visibility = 'visible';
+    
+    // Activate first tab immediately
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('v-of').classList.add('active');
+    document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+    const ofBtn = document.querySelector('[data-v="of"]');
+    if(ofBtn) ofBtn.classList.add('active');
+    
+    // Use requestAnimationFrame to ensure DOM is painted before rendering
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        console.log('v-of exists:', !!document.getElementById('v-of'));
+        rKpis();
+        rOF();
+        rSuivi();
+        rProd();
+        rHist();
+        rArts();
+        rEq();
+        setDbBadge('ok', currentUser.email.split('@')[0]);
+        console.log('App ready! v-of length:', document.getElementById('v-of').innerHTML.length);
+      });
+    });
   });
 } else {
   // Supabase non configuré (ne devrait pas arriver)
