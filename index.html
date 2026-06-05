@@ -393,6 +393,14 @@ async function doAuth(){
   document.getElementById('auth-btn').textContent = isSignup?'Créer le compte':'Se connecter';
 }
 
+// Debug helper
+window.testAuth = async function(){
+  const {data,error} = await sb.auth.getSession();
+  console.log('Session:', data, 'Error:', error);
+  const {data:d2,error:e2} = await sb.auth.getUser();
+  console.log('User:', d2, 'Error:', e2);
+};
+
 async function doSignOut(){
   await sb.auth.signOut();
   currentUser = null; orgId = null;
@@ -403,16 +411,19 @@ async function doSignOut(){
 
 if(sb){
   sb.auth.onAuthStateChange(async (event, session) => {
+    console.log('Auth event:', event, session?.user?.email);
     if(session?.user){
       currentUser = session.user;
       orgId = currentUser.id;
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('main-app').style.display = 'block';
-      setDbBadge('loading', 'Chargement...');
-      await dbLoad();
-      rAll();
+      if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED'){
+        setDbBadge('loading', 'Chargement...');
+        await dbLoad();
+        rAll();
+      }
       setDbBadge('ok', currentUser.email.split('@')[0]);
-    } else {
+    } else if(event === 'SIGNED_OUT' || event === 'INITIAL_SESSION'){
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('main-app').style.display = 'none';
       setDbBadge('loading', 'Non connecté');
@@ -584,10 +595,24 @@ function clearData(){
 // Check Supabase connectivity on load
 (async ()=>{
   try {
-    const { data } = await sb.auth.getSession();
-    if(!data?.session) setDbBadge('loading','Non connecté');
-    else setDbBadge('ok','Connecté');
-  } catch(e){ setDbBadge('err','Supabase inaccessible'); }
+    const { data, error } = await sb.auth.getSession();
+    if(error) throw error;
+    if(!data?.session){
+      // No session — show login screen clearly
+      setDbBadge('loading','Non connecté');
+      document.getElementById('login-screen').style.display='flex';
+      document.getElementById('main-app').style.display='none';
+    } else {
+      // Session exists — onAuthStateChange will handle it
+      setDbBadge('ok','Connecté');
+    }
+  } catch(e){
+    console.error('Supabase error:', e);
+    setDbBadge('err','Supabase inaccessible');
+    // Show login screen even on error
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('main-app').style.display='none';
+  }
 })();
 
 const LP=['Entrepôt 4','Entrepôt 5'];
