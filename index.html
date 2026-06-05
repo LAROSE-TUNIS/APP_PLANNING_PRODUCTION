@@ -183,7 +183,7 @@ input:focus,select:focus{outline:2px solid #BA7517;outline-offset:-1px;border-co
 </div>
 
 <!-- MAIN APP -->
-<div class="app" id="main-app" style="visibility:hidden;min-height:100vh">
+<div class="app" id="main-app" style="display:none">
 <div class="app">
 <div class="header">
   <div class="brand">
@@ -406,7 +406,7 @@ window.testAuth = async function(){
 async function doSignOut(){
   await sb.auth.signOut();
   currentUser = null; orgId = null;
-  document.getElementById('main-app').style.visibility = 'hidden';
+  document.getElementById('main-app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   setDbBadge('loading', 'Déconnecté');
 }
@@ -417,7 +417,7 @@ if(sb){
     
     if(event === 'SIGNED_OUT'){
       document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('main-app').style.visibility = 'hidden';
+      document.getElementById('main-app').style.display = 'none';
       setDbBadge('loading', 'Non connecté');
       return;
     }
@@ -429,7 +429,7 @@ if(sb){
     
     // Show app immediately
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.visibility = 'visible';
+    document.getElementById('main-app').style.display = 'block';
     
     // Load data from DB
     setDbBadge('loading', 'Chargement...');
@@ -437,7 +437,7 @@ if(sb){
     
     // Show app
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.visibility = 'visible';
+    document.getElementById('main-app').style.display = 'block';
     
     // Activate first tab
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -621,27 +621,24 @@ function clearData(){
     const { data, error } = await sb.auth.getSession();
     if(error) throw error;
     if(data?.session?.user){
-      // Session exists - render app immediately
       currentUser = data.session.user;
       orgId = currentUser.id;
+      // Show app
       document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('main-app').style.visibility = 'visible';
+      document.getElementById('main-app').style.display = 'block';
       setDbBadge('loading', 'Chargement...');
       await dbLoad();
-      // Activate first tab
+      // Activate OF tab
       document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
       document.getElementById('v-of').classList.add('active');
       document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-      const ofBtn = document.querySelector('[data-v="of"]');
-      if(ofBtn) ofBtn.classList.add('active');
-      // Render
+      document.querySelector('[data-v="of"]')?.classList.add('active');
+      // Render all panels
       rKpis(); rOF(); rSuivi(); rProd(); rHist(); rArts(); rEq();
       setDbBadge('ok', currentUser.email.split('@')[0]);
-      console.log('App rendered from getSession');
     } else {
-      // No session - show login
       document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('main-app').style.visibility = 'hidden';
+      document.getElementById('main-app').style.display = 'none';
       setDbBadge('loading', 'Non connecté');
     }
   } catch(e){
