@@ -427,15 +427,14 @@ if(sb){
         rAll();
       } catch(e) {
         console.error('rAll failed:', e);
-        // Try rendering each panel individually
-        try { rKpis(); } catch(e2) { console.error('rKpis:', e2); }
-        try { rOF(); } catch(e2) { console.error('rOF:', e2); }
-        try { rSuivi(); } catch(e2) { console.error('rSuivi:', e2); }
-        try { rProd(); } catch(e2) { console.error('rProd:', e2); }
-        try { rHist(); } catch(e2) { console.error('rHist:', e2); }
-        try { rArts(); } catch(e2) { console.error('rArts:', e2); }
-        try { rEq(); } catch(e2) { console.error('rEq:', e2); }
       }
+      // Ensure first panel is visible
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      const firstPanel = document.getElementById('v-of');
+      if(firstPanel) firstPanel.classList.add('active');
+      document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+      const firstBtn = document.querySelector('.nb[data-v="of"]');
+      if(firstBtn) firstBtn.classList.add('active');
       setDbBadge('ok', currentUser.email.split('@')[0]);
     } else {
       document.getElementById('login-screen').style.display = 'flex';
