@@ -384,7 +384,9 @@ async function doAuth(){
     } else {
       res = await sb.auth.signInWithPassword({ email, password: pass });
       if(res.error) throw res.error;
-      // onAuthStateChange will handle the rest
+      // Reload page - on reload getSession() finds the session and renders app
+      location.reload();
+      return;
     }
   } catch(e){
     errEl.textContent = e.message || 'Erreur de connexion.';
@@ -618,21 +620,34 @@ function clearData(){
   try {
     const { data, error } = await sb.auth.getSession();
     if(error) throw error;
-    if(!data?.session){
-      // No session — show login screen clearly
-      setDbBadge('loading','Non connecté');
-      document.getElementById('login-screen').style.display='flex';
-      document.getElementById('main-app').style.visibility='hidden';
+    if(data?.session?.user){
+      // Session exists - render app immediately
+      currentUser = data.session.user;
+      orgId = currentUser.id;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-app').style.visibility = 'visible';
+      setDbBadge('loading', 'Chargement...');
+      await dbLoad();
+      // Activate first tab
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('v-of').classList.add('active');
+      document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+      const ofBtn = document.querySelector('[data-v="of"]');
+      if(ofBtn) ofBtn.classList.add('active');
+      // Render
+      rKpis(); rOF(); rSuivi(); rProd(); rHist(); rArts(); rEq();
+      setDbBadge('ok', currentUser.email.split('@')[0]);
+      console.log('App rendered from getSession');
     } else {
-      // Session exists — onAuthStateChange will handle it
-      setDbBadge('ok','Connecté');
+      // No session - show login
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('main-app').style.visibility = 'hidden';
+      setDbBadge('loading', 'Non connecté');
     }
   } catch(e){
-    console.error('Supabase error:', e);
-    setDbBadge('err','Supabase inaccessible');
-    // Show login screen even on error
-    document.getElementById('login-screen').style.display='flex';
-    document.getElementById('main-app').style.visibility='hidden';
+    console.error('Init error:', e);
+    document.getElementById('login-screen').style.display = 'flex';
+    setDbBadge('err', 'Erreur connexion');
   }
 })();
 
